@@ -351,9 +351,9 @@ function watchKill(){
   killBurst.push(t);
   killBurst=killBurst.filter(v=>t-v<0.6);
   killsSinceLetter++;
-  if(!feedSeen||deathPending||!letterFree())return;
+  if(deathPending||!letterFree())return;
   let go=false;
-  if(!deathSeen)go=killsSinceLetter>=3&&sinceLetter()>2;
+  if(!deathSeen)go=killsSinceLetter>=5&&sinceLetter()>2;
   else if(sinceLetter()>LETTER_GAP)go=(killBurst.length>=3&&Math.random()<.4)||killsSinceLetter>=30;
   if(!go)return;
   killBurst=[];
