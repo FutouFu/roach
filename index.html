@@ -31,6 +31,100 @@ iframe{display:block;width:100%;height:100%;border:0;background:#efe8dc}
   <iframe id="labFrame" title="잡은 바퀴벌레" allow="autoplay"></iframe>
   <button id="labBack" type="button" aria-label="게임으로 돌아가기">돌아가기</button>
 </div>
+
+<!-- ───────── 인트로 · 바퀴벌레에게서 온 편지 ───────── -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Noto+Sans+KR:wght@500;700;800&display=swap">
+<style>
+#intro{position:fixed;inset:0;z-index:45;display:grid;place-items:center;padding:24px 22px calc(24px + env(safe-area-inset-bottom));background:radial-gradient(ellipse at 50% 35%,#ffffff 0%,#e6f1ee 70%,#d3e6e0 100%);transition:opacity .35s}
+#intro.gone{opacity:0;pointer-events:none}
+#intro .box{width:min(100%,560px);text-align:center;font:500 clamp(15.5px,4.3vw,19px)/1.8 "Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;color:#17372f;word-break:keep-all}
+#intro .tag{display:inline-block;margin-bottom:22px;padding:6px 14px;border-radius:999px;background:#0f7a63;color:#fff;font-size:13px;font-weight:800;letter-spacing:.14em}
+#intro p{margin:0 0 14px;opacity:0;transform:translateY(10px);transition:opacity .7s,transform .7s}
+#intro p.on{opacity:1;transform:none}
+#intro p b{color:#0f7a63;font-weight:800}
+#introGo{margin-top:22px;width:100%;max-width:340px;height:56px;border:0;border-radius:16px;background:#0f7a63;color:#fff;font:800 18px/1 "Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;box-shadow:0 3px 0 #0a5646,0 10px 24px rgba(15,122,99,.3);opacity:0;transition:opacity .6s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#introGo.on{opacity:1}
+#introGo:active{transform:translateY(3px);box-shadow:0 0 0 #0a5646}
+
+#mail{position:fixed;inset:0;z-index:60;display:none;place-items:center;padding:20px;background:rgba(255,236,190,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#mail.show{display:grid}
+#mail.closing{animation:mailOut .28s ease-in forwards}
+@keyframes mailOut{to{opacity:0}}
+#mail .env{position:absolute;left:50%;top:50%;width:210px;height:136px;margin:-68px 0 0 -105px;border-radius:10px;background:#f7d774;box-shadow:0 10px 26px rgba(120,80,10,.35);animation:envIn .45s cubic-bezier(.3,1.5,.5,1) both}
+#mail .env::before{content:"";position:absolute;left:0;right:0;top:0;height:86px;background:#f2c94c;clip-path:polygon(0 0,100% 0,50% 100%)}
+#mail .env::after{content:"";position:absolute;left:50%;top:70px;width:30px;height:30px;margin-left:-15px;border-radius:50%;background:#e2533e;box-shadow:inset 0 -3px 0 #b93a28}
+@keyframes envIn{0%{transform:translateY(-110vh) rotate(-14deg)}100%{transform:none}}
+#mail.open .env{animation:envAway .3s ease-in forwards}
+@keyframes envAway{to{transform:translateY(50vh) scale(.8);opacity:0}}
+#mail .card{position:relative;width:min(100%,380px);border-radius:22px;background:
+  radial-gradient(circle at 12px 12px,rgba(255,170,150,.3) 3.2px,transparent 3.6px) 0 0/34px 34px,
+  radial-gradient(circle at 29px 29px,rgba(120,190,230,.26) 2.6px,transparent 3px) 0 0/34px 34px,#fffaf0;
+  box-shadow:0 0 0 6px #fff,0 0 0 9px var(--lc,#8fd1b8),0 18px 40px rgba(110,70,20,.35);padding:20px 22px 18px;opacity:0;transform:translateY(34px) scale(.94)}
+#mail.open .card{animation:cardIn .4s .08s cubic-bezier(.25,1.4,.5,1) forwards}
+@keyframes cardIn{to{opacity:1;transform:none}}
+#mail .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+#mail .ttl{padding:5px 12px;border-radius:999px;background:var(--lc,#8fd1b8);color:#fff;font:800 13px/1.2 "Noto Sans KR",system-ui,sans-serif;letter-spacing:.02em}
+#mail .stamp{flex:none;width:58px;height:73px;margin:-4px -4px 0 0;transform:rotate(6deg);filter:drop-shadow(0 2px 3px rgba(0,0,0,.2))}
+#mail .stamp svg{display:block;width:100%;height:100%}
+#mail .body{margin:10px 0 6px;font:700 25px/40px "Gaegu","Apple SD Gothic Neo",cursive;color:#4a3320;word-break:keep-all;letter-spacing:-.02em;background:repeating-linear-gradient(transparent 0 39px,rgba(200,150,90,.38) 39px 40px)}
+#mail .body div{min-height:40px}
+#mail .from{text-align:right;font:700 23px/1.4 "Gaegu","Apple SD Gothic Neo",cursive;color:#7a4a1c}
+#mailOk{display:block;width:100%;height:50px;margin-top:14px;border:0;border-radius:999px;background:#f7a93b;color:#fff;font:800 17px/1 "Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;box-shadow:0 4px 0 #cf7f16;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#mailOk:active{transform:translateY(4px);box-shadow:0 0 0 #cf7f16}
+</style>
+
+<div id="intro" hidden>
+  <div class="box">
+    <div class="tag">공포 극복 시뮬레이션</div>
+    <p>본 시뮬레이션은 <b>바퀴벌레에 대한 공포</b>로<br>일상에 어려움을 겪는 분들을 위해<br>제작되었습니다.</p>
+    <p>바퀴벌레를 보고도<br>잡지 못했던 경험이 있으신가요?</p>
+    <p>반복적인 노출과 직접적인 대처 경험은<br>공포를 줄이는 데 도움이 됩니다.</p>
+    <p>지금부터 안전한 환경에서<br>바퀴벌레와 마주하는 연습을 시작합니다.</p>
+    <button id="introGo" type="button">시작하기</button>
+  </div>
+</div>
+
+<div id="mail" aria-hidden="true">
+  <div class="env"></div>
+  <div class="card" role="dialog" aria-label="바퀴벌레에게서 온 편지">
+    <div class="top">
+      <div class="ttl">바퀴벌레에게서 온 편지</div>
+      <div class="stamp"><svg viewBox="0 0 62 78" aria-hidden="true">
+        <defs>
+          <mask id="mailPerf"><rect width="62" height="78" fill="#fff"/><g fill="#000" id="mailPerfDots"></g></mask>
+          <radialGradient id="mailWing" cx=".42" cy=".3" r=".8"><stop offset="0" stop-color="#c98a4b"/><stop offset=".55" stop-color="#8a4a1e"/><stop offset="1" stop-color="#4a220b"/></radialGradient>
+          <radialGradient id="mailPro" cx=".45" cy=".35" r=".75"><stop offset="0" stop-color="#e2b77c"/><stop offset="1" stop-color="#9a6630"/></radialGradient>
+          <linearGradient id="mailSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--lc,#8fd1b8)"/><stop offset="1" stop-color="#fff6d8"/></linearGradient>
+        </defs>
+        <g mask="url(#mailPerf)">
+          <rect width="62" height="78" fill="#fff"/>
+          <rect x="5" y="5" width="52" height="68" fill="url(#mailSky)"/>
+          <circle cx="46" cy="16" r="6" fill="#ffd45a"/>
+          <rect x="5" y="58" width="52" height="15" fill="#d9a766"/>
+        </g>
+        <g transform="translate(31 38)">
+          <ellipse cx="1.5" cy="3" rx="10" ry="19" fill="#000" opacity=".18"/>
+          <g stroke="#2b1406" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M-2 -17 C-6 -24 -11 -27 -18 -30"/><path d="M2 -17 C6 -24 11 -27 18 -30"/>
+            <path d="M-6 -8 L-12 -11 L-16 -17"/><path d="M6 -8 L12 -11 L16 -17"/>
+            <path d="M-7 -2 L-14 1 L-19 6"/><path d="M7 -2 L14 1 L19 6"/>
+            <path d="M-6 3 L-13 10 L-17 21"/><path d="M6 3 L13 10 L17 21"/>
+          </g>
+          <path d="M0 -8 C8 -8 9 2 8 10 C7 18 3 22 0 22 C-3 22 -7 18 -8 10 C-9 2 -8 -8 0 -8 Z" fill="url(#mailWing)"/>
+          <path d="M0 -7 C-1 4 -1 14 0 22" stroke="#3a1a06" stroke-width=".8" fill="none"/>
+          <path d="M-4 -4 C-6 4 -5 12 -3 18" stroke="#f0c48a" stroke-width="1.1" fill="none" opacity=".45" stroke-linecap="round"/>
+          <path d="M0 -17 C6 -17 9 -13 9 -9 C9 -7 5 -6 0 -6 C-5 -6 -9 -7 -9 -9 C-9 -13 -6 -17 0 -17 Z" fill="url(#mailPro)"/>
+          <path d="M-2.4 -15.5 C-3 -12 -3 -9 -2.2 -7 M2.4 -15.5 C3 -12 3 -9 2.2 -7" stroke="#3a1a06" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <ellipse cx="0" cy="-18" rx="2.8" ry="2" fill="#5a2d10"/>
+        </g>
+      </svg></div>
+    </div>
+    <div class="body" id="mailBody"></div>
+    <div class="from">바퀴벌레가</div>
+    <button id="mailOk" type="button">확인</button>
+  </div>
+</div>
+
 <div id="boot" aria-hidden="true"></div>
 <div id="error" role="alert"></div>
 
@@ -87,6 +181,9 @@ async function waitForGame(){
         THREE=w.__THREE;
         GSFX=w.__SFX||null;
         installTweezerMode();
+        installLetters();
+        if(introActive)holdGameForIntro();
+        else if(startWhenReady)beginTreatment();
         boot.classList.add('done');
         setTimeout(()=>boot.remove(),300);
         return;
@@ -103,6 +200,172 @@ gameFrame.addEventListener('load',()=>{
   cap=null;
   waitForGame();
 });
+
+// ───────── 인트로 · 바퀴벌레에게서 온 편지 ─────────
+const LETTER={
+  feed:{color:'#8fd1b8',lines:['바퀴벌레의 삶을','내 자식들에게도 물려줘야지']},
+  death:{color:'#f5a8b8',lines:['하지만,','사랑이 이긴다']},
+  lab:{color:'#9cc8f0',lines:['우리를 더 잘 알게 되면,','더 이상 무섭지 않을걸요?','바퀴벌레는 머리가 없어도','일주일을 살 수 있어요.']},
+};
+const LETTER_GAP=40;                    // 편지끼리 최소 간격(초)
+const introEl=document.getElementById('intro');
+const introGo=document.getElementById('introGo');
+const mailEl=document.getElementById('mail');
+const mailOk=document.getElementById('mailOk');
+let introActive=false, startWhenReady=false;
+let mailOpen=false, mailDone=null, mailPausedGame=false;
+let lastLetterAt=-1e9, feedSeen=false, labLetterShown=false;
+let killBurst=[], deathPending=0;
+
+{ // 우표 톱니
+  let d='';
+  for(let x=1;x<64;x+=6)d+=`<circle cx="${x}" cy="0" r="2.6"/><circle cx="${x}" cy="78" r="2.6"/>`;
+  for(let y=4;y<78;y+=6)d+=`<circle cx="0" cy="${y}" r="2.6"/><circle cx="62" cy="${y}" r="2.6"/>`;
+  document.getElementById('mailPerfDots').innerHTML=d;
+}
+
+// 편지 소리 (이 창에서 낸다)
+let MA=null;
+function mailAudio(){
+  if(!MA){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;try{MA=new C();}catch(e){return null;}}
+  if(MA.state==='suspended')MA.resume().catch(()=>{});
+  return MA;
+}
+function mTone(f,t,dur,gain,type='triangle'){
+  const c=MA,t0=c.currentTime+t,o=c.createOscillator(),g=c.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t0);
+  g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(gain,t0+.012);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+  o.connect(g);g.connect(c.destination);o.start(t0);o.stop(t0+dur+.05);
+}
+function mPaper(t,dur,gain,from,to){
+  const c=MA,t0=c.currentTime+t,len=Math.ceil(c.sampleRate*dur),buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(Math.random()<.35?1:.3);
+  const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();
+  s.buffer=buf;f.type='bandpass';f.Q.value=.8;
+  f.frequency.setValueAtTime(from,t0);f.frequency.exponentialRampToValueAtTime(to,t0+dur);
+  g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(gain,t0+.03);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+  s.connect(f);f.connect(g);g.connect(c.destination);s.start(t0);
+}
+function sfxMailIn(){
+  if(!mailAudio())return;
+  [784,988,1175,1568].forEach((f,i)=>{mTone(f,i*.07,.5,.16);mTone(f*2,i*.07,.18,.04,'sine');});
+  mTone(2093,.3,.9,.07,'sine');
+  mPaper(.45,.2,.22,900,3200);
+  mPaper(.62,.28,.16,2400,1200);
+}
+function sfxMailOut(){
+  if(!mailAudio())return;
+  mPaper(0,.18,.2,1800,700);
+  mTone(1175,.05,.25,.1);mTone(1568,.12,.35,.1);
+}
+
+function showLetter(kind,onDone){
+  const L=LETTER[kind];
+  if(!L||mailOpen)return false;
+  mailOpen=true;mailDone=onDone||null;
+  lastLetterAt=performance.now()/1000;
+  mailEl.style.setProperty('--lc',L.color);
+  const body=document.getElementById('mailBody');
+  body.textContent='';
+  for(const line of L.lines){const d=document.createElement('div');d.textContent=line;body.appendChild(d);}
+  // 게임 중이면 멈춘다
+  mailPausedGame=false;
+  if(G&&G.state==='r1'&&!labOpen&&!introActive){
+    mailPausedGame=!G.paused;
+    G.r1.cancel?.();
+    G.input.reset?.();
+    G.paused=true;
+  }
+  const env=mailEl.querySelector('.env');env.replaceWith(env.cloneNode(true));
+  mailEl.classList.remove('open','closing');
+  mailEl.classList.add('show');
+  mailEl.setAttribute('aria-hidden','false');
+  sfxMailIn();
+  setTimeout(()=>{if(mailOpen)mailEl.classList.add('open');},650);
+  return true;
+}
+function closeLetter(){
+  if(!mailOpen)return;
+  mailOpen=false;
+  lastLetterAt=performance.now()/1000;
+  sfxMailOut();
+  mailEl.classList.add('closing');
+  setTimeout(()=>{mailEl.classList.remove('show','open','closing');mailEl.setAttribute('aria-hidden','true');},280);
+  if(mailPausedGame&&G){G.paused=false;G.r1.touch?.();}
+  mailPausedGame=false;
+  const done=mailDone;mailDone=null;done?.();
+}
+mailOk.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeLetter();});
+mailEl.addEventListener('pointerdown',()=>{if(mailOpen)mailEl.classList.add('open');});
+
+const letterReady=()=>G&&G.state==='r1'&&!labOpen&&!mailOpen&&!introActive&&!cap&&performance.now()/1000-lastLetterAt>LETTER_GAP;
+
+// 먹이: 바퀴가 먹이에 입을 대고 1초쯤 먹으면 한 번 검사. 처음은 반드시, 이후엔 가끔.
+function watchFeeding(dt){
+  if(!G||G.state!=='r1')return;
+  for(const r of G.r1.roaches){
+    if(r.state!=='feed'||!r.bait||r.gone){r.__eat=0;continue;}
+    if(Math.hypot(r.tx-r.x,r.tz-r.z)>0.05)continue;
+    const before=r.__eat||0;
+    r.__eat=before+dt;
+    if(before<1&&r.__eat>=1&&!r.__eatChecked){
+      r.__eatChecked=true;
+      if(letterReady()&&(!feedSeen||Math.random()<.25)){
+        if(showLetter('feed'))feedSeen=true;
+      }
+    }
+  }
+}
+// 죽음: 먹이 편지를 한 번 본 뒤, 짧은 시간에 여러 마리를 죽였을 때 가끔. 터지는 모습을 보고 나서 뜨게 조금 늦춘다.
+function watchKill(){
+  const t=performance.now()/1000;
+  killBurst.push(t);
+  killBurst=killBurst.filter(v=>t-v<0.5);
+  if(killBurst.length===3&&feedSeen&&!deathPending&&letterReady()&&Math.random()<.35){
+    deathPending=setTimeout(()=>{deathPending=0;if(G&&G.state==='r1'&&!labOpen&&!mailOpen)showLetter('death');},700);
+  }
+}
+function installLetters(){
+  const upd=G.r1.update.bind(G.r1);
+  G.r1.update=function(dt){const out=upd(dt);watchFeeding(dt);return out;};
+  const kill=G.r1.killRoach.bind(G.r1);
+  G.r1.killRoach=function(r,...rest){const alive=r&&r.state!=='dead';const out=kill(r,...rest);if(alive)watchKill();return out;};
+}
+
+// 인트로: 문장이 차례로 떠오른다. 화면을 누르면 한 번에 다 보인다.
+function introReveal(all){
+  const items=[...introEl.querySelectorAll('p'),introGo];
+  items.forEach((el,i)=>{
+    if(all)el.classList.add('on');
+    else setTimeout(()=>el.classList.add('on'),350+i*900);
+  });
+}
+function beginTreatment(){
+  introActive=false;
+  if(!G){startWhenReady=true;return;}
+  startWhenReady=false;
+  try{GSFX?.ensure?.();}catch(e){}
+  G.sleep=false;G.paused=false;
+  G.r1.stop();
+  G.startRound1();
+}
+function holdGameForIntro(){
+  G.paused=true;G.sleep=true;G.ui.hintClear?.();
+}
+introEl.addEventListener('pointerdown',e=>{if(e.target!==introGo)introReveal(true);});
+introGo.addEventListener('click',e=>{
+  e.preventDefault();
+  mailAudio();
+  introEl.classList.add('gone');
+  setTimeout(()=>{introEl.hidden=true;},360);
+  beginTreatment();
+});
+if(!new URLSearchParams(location.search).get('r')){
+  introActive=true;
+  introEl.hidden=false;
+  introReveal(false);
+}
+
 
 // ───────── 소리 (게임 효과음 엔진을 빌려 쓴다) ─────────
 function sfxGrip(){
@@ -491,10 +754,14 @@ function openLab(meta={}){
   labLayer.setAttribute('aria-hidden','false');
   gameFrame.classList.add('covered');
   enterLab();
+  if(!labLetterShown){
+    labLetterShown=true;
+    setTimeout(()=>{if(labOpen)showLetter('lab');},450);
+  }
 }
 
 function closeLab(){
-  if(!labOpen||closeBusy)return;
+  if(!labOpen||closeBusy||mailOpen)return;
   closeBusy=true;
   try{labApi()?.sleep?.();}catch(err){console.warn(err);}
   labLayer.classList.remove('open');
@@ -531,6 +798,7 @@ window.addEventListener('message',e=>{
 });
 
 window.addEventListener('keydown',e=>{
+  if(e.code==='Escape'&&mailOpen){e.preventDefault();closeLetter();return;}
   if(e.code==='Escape'&&labOpen){e.preventDefault();closeLab();}
 });
 </script>
