@@ -71,13 +71,14 @@ iframe{display:block;width:100%;height:100%;border:0;background:#efe8dc}
 #mail .from{text-align:right;font:700 23px/1.4 "Gaegu","Apple SD Gothic Neo",cursive;color:#7a4a1c}
 #mail .fact{position:relative;margin-top:14px;padding:16px 14px 12px;border-radius:14px;background:#fff;border:2px dashed #7fb6e6;font:700 15px/1.55 "Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;color:#23456b;word-break:keep-all;white-space:pre-line}
 #mail .fact[hidden]{display:none}
-#mail .fact-tag{position:absolute;left:12px;top:-13px;padding:4px 11px 5px;border-radius:999px;background:#ff8a3d;color:#fff;font:900 14px/1 "Noto Sans KR",system-ui,sans-serif;box-shadow:0 2px 0 #d8661c;transform:rotate(-4deg)}width:100%;height:50px;margin-top:14px;border:0;border-radius:999px;background:#f7a93b;color:#fff;font:800 17px/1 "Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;box-shadow:0 4px 0 #cf7f16;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#mail .fact-tag{position:absolute;left:12px;top:-13px;padding:4px 11px 5px;border-radius:999px;background:#ff8a3d;color:#fff;font:900 14px/1 "Noto Sans KR",system-ui,sans-serif;box-shadow:0 2px 0 #d8661c;transform:rotate(-4deg)}
+#mailOk{display:block;width:100%;height:50px;margin-top:14px;border:0;border-radius:999px;background:#f7a93b;color:#fff;font:800 17px/1 "Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;box-shadow:0 4px 0 #cf7f16;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 #mailOk:active{transform:translateY(4px);box-shadow:0 0 0 #cf7f16}
 </style>
 
 <div id="intro" hidden>
   <div class="box">
-    <div class="tag">공포 극복 시뮬레이션</div>
+    <div class="tag">인지행동치료 프로그램</div>
     <p>본 시뮬레이션은 <b>바퀴벌레에 대한 공포</b>로<br>일상에 어려움을 겪는 분들을 위해<br>제작되었습니다.</p>
     <p>바퀴벌레를 보고도<br>잡지 못했던 경험이 있으신가요?</p>
     <p>반복적인 노출과 직접적인 대처 경험은<br>공포를 줄이는 데 도움이 됩니다.</p>
@@ -122,6 +123,7 @@ iframe{display:block;width:100%;height:100%;border:0;background:#efe8dc}
       </svg></div>
     </div>
     <div class="body" id="mailBody"></div>
+    <div class="from">바퀴벌레가</div>
     <div class="fact" id="mailFact" hidden><span class="fact-tag">짤막 상식!</span><span id="mailFactText"></span></div>
     <button id="mailOk" type="button">확인</button>
   </div>
@@ -277,6 +279,7 @@ function pickFact(list){
   if(!factBag.length)factBag=list.slice().sort(()=>Math.random()-.5);
   return factBag.pop();
 }
+function showLetter(kind,onDone){
   const L=LETTER[kind];
   if(!L||mailOpen)return false;
   mailOpen=true;mailDone=onDone||null;
@@ -284,6 +287,7 @@ function pickFact(list){
   mailEl.style.setProperty('--lc',L.color);
   const body=document.getElementById('mailBody');
   body.textContent='';
+  for(const line of L.lines){const d=document.createElement('div');d.textContent=line;body.appendChild(d);}
   const factText=L.facts?pickFact(L.facts):'';
   const fact=document.getElementById('mailFact');
   fact.hidden=!factText;
