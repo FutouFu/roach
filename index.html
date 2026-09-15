@@ -69,7 +69,9 @@ iframe{display:block;width:100%;height:100%;border:0;background:#efe8dc}
 #mail .body{margin:10px 0 6px;font:700 25px/40px "Gaegu","Apple SD Gothic Neo",cursive;color:#4a3320;word-break:keep-all;letter-spacing:-.02em;background:repeating-linear-gradient(transparent 0 39px,rgba(200,150,90,.38) 39px 40px)}
 #mail .body div{min-height:40px}
 #mail .from{text-align:right;font:700 23px/1.4 "Gaegu","Apple SD Gothic Neo",cursive;color:#7a4a1c}
-#mailOk{display:block;width:100%;height:50px;margin-top:14px;border:0;border-radius:999px;background:#f7a93b;color:#fff;font:800 17px/1 "Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;box-shadow:0 4px 0 #cf7f16;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#mail .fact{position:relative;margin-top:14px;padding:16px 14px 12px;border-radius:14px;background:#fff;border:2px dashed #7fb6e6;font:700 15px/1.55 "Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;color:#23456b;word-break:keep-all;white-space:pre-line}
+#mail .fact[hidden]{display:none}
+#mail .fact-tag{position:absolute;left:12px;top:-13px;padding:4px 11px 5px;border-radius:999px;background:#ff8a3d;color:#fff;font:900 14px/1 "Noto Sans KR",system-ui,sans-serif;box-shadow:0 2px 0 #d8661c;transform:rotate(-4deg)}width:100%;height:50px;margin-top:14px;border:0;border-radius:999px;background:#f7a93b;color:#fff;font:800 17px/1 "Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;box-shadow:0 4px 0 #cf7f16;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 #mailOk:active{transform:translateY(4px);box-shadow:0 0 0 #cf7f16}
 </style>
 
@@ -120,7 +122,7 @@ iframe{display:block;width:100%;height:100%;border:0;background:#efe8dc}
       </svg></div>
     </div>
     <div class="body" id="mailBody"></div>
-    <div class="from">바퀴벌레가</div>
+    <div class="fact" id="mailFact" hidden><span class="fact-tag">짤막 상식!</span><span id="mailFactText"></span></div>
     <button id="mailOk" type="button">확인</button>
   </div>
 </div>
@@ -205,7 +207,17 @@ gameFrame.addEventListener('load',()=>{
 const LETTER={
   feed:{color:'#8fd1b8',lines:['바퀴벌레의 삶을','내 자식들에게도 물려줘야지']},
   death:{color:'#f5a8b8',lines:['하지만,','사랑이 이긴다']},
-  lab:{color:'#9cc8f0',lines:['우리를 더 잘 알게 되면,','더 이상 무섭지 않을걸요?','바퀴벌레는 머리가 없어도','일주일을 살 수 있어요.']},
+  lab:{color:'#9cc8f0',lines:['우리를 더 잘 알게 되면,','더 이상 무섭지 않을걸요?'],facts:[
+    '바퀴벌레는 머리가 없어도\n일주일을 살 수 있어요.',
+    '머리 없는 바퀴벌레가 결국 죽는 건\n물을 못 마셔서예요.',
+    '바퀴벌레는 먹이 없이도\n한 달쯤 버틸 수 있어요.',
+    '바퀴벌레는 1초에\n자기 몸길이의 50배를 달려요.',
+    '바퀴벌레는 동전 두께 틈에도\n몸을 납작하게 눌러 들어가요.',
+    '바퀴벌레는 숨을 40분 동안\n참을 수 있어요.',
+    '알집 하나에는 알이\n30~40개 들어 있어요.',
+    '바퀴벌레의 피는 빨갛지 않아요.\n거의 투명해요.',
+    '바퀴벌레의 조상은 3억 년 전\n화석에서도 발견돼요.',
+  ]},
 };
 const LETTER_GAP=40;                    // 편지끼리 최소 간격(초)
 const introEl=document.getElementById('intro');
@@ -259,7 +271,12 @@ function sfxMailOut(){
   mTone(1175,.05,.25,.1);mTone(1568,.12,.35,.1);
 }
 
-function showLetter(kind,onDone){
+// 상식은 한 바퀴 다 보여 줄 때까지 겹치지 않게 뽑는다
+let factBag=[];
+function pickFact(list){
+  if(!factBag.length)factBag=list.slice().sort(()=>Math.random()-.5);
+  return factBag.pop();
+}
   const L=LETTER[kind];
   if(!L||mailOpen)return false;
   mailOpen=true;mailDone=onDone||null;
@@ -267,7 +284,10 @@ function showLetter(kind,onDone){
   mailEl.style.setProperty('--lc',L.color);
   const body=document.getElementById('mailBody');
   body.textContent='';
-  for(const line of L.lines){const d=document.createElement('div');d.textContent=line;body.appendChild(d);}
+  const factText=L.facts?pickFact(L.facts):'';
+  const fact=document.getElementById('mailFact');
+  fact.hidden=!factText;
+  document.getElementById('mailFactText').textContent=factText;
   // 게임 중이면 멈춘다
   mailPausedGame=false;
   if(G&&G.state==='r1'&&!labOpen&&!introActive){
@@ -298,9 +318,11 @@ function closeLetter(){
 mailOk.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeLetter();});
 mailEl.addEventListener('pointerdown',()=>{if(mailOpen)mailEl.classList.add('open');});
 
-const letterReady=()=>G&&G.state==='r1'&&!labOpen&&!mailOpen&&!introActive&&!cap&&performance.now()/1000-lastLetterAt>LETTER_GAP;
+const letterFree=()=>G&&G.state==='r1'&&!labOpen&&!mailOpen&&!introActive&&!cap;
+const sinceLetter=()=>performance.now()/1000-lastLetterAt;
+let deathSeen=false, killsSinceLetter=0;
 
-// 먹이: 바퀴가 먹이에 입을 대고 1초쯤 먹으면 한 번 검사. 처음은 반드시, 이후엔 가끔.
+// 먹이: 바퀴가 먹이에 입을 대고 1초쯤 먹으면 검사. 처음은 반드시, 이후엔 간격이 지났을 때 가끔.
 function watchFeeding(dt){
   if(!G||G.state!=='r1')return;
   for(const r of G.r1.roaches){
@@ -310,20 +332,31 @@ function watchFeeding(dt){
     r.__eat=before+dt;
     if(before<1&&r.__eat>=1&&!r.__eatChecked){
       r.__eatChecked=true;
-      if(letterReady()&&(!feedSeen||Math.random()<.25)){
-        if(showLetter('feed'))feedSeen=true;
+      if(!letterFree())continue;
+      if(!feedSeen||(sinceLetter()>LETTER_GAP&&Math.random()<.15)){
+        if(showLetter('feed')){feedSeen=true;killsSinceLetter=0;}
       }
     }
   }
 }
-// 죽음: 먹이 편지를 한 번 본 뒤, 짧은 시간에 여러 마리를 죽였을 때 가끔. 터지는 모습을 보고 나서 뜨게 조금 늦춘다.
+// 죽음: 먹이 편지를 본 뒤에만.
+// 첫 번째는 먹이 편지를 닫고 세 마리째 죽일 때 반드시 뜬다.
+// 이후엔 간격이 지난 뒤 한 번에 여러 마리를 죽이면 가끔, 아니면 30마리째마다 뜬다.
 function watchKill(){
   const t=performance.now()/1000;
   killBurst.push(t);
-  killBurst=killBurst.filter(v=>t-v<0.5);
-  if(killBurst.length===3&&feedSeen&&!deathPending&&letterReady()&&Math.random()<.35){
-    deathPending=setTimeout(()=>{deathPending=0;if(G&&G.state==='r1'&&!labOpen&&!mailOpen)showLetter('death');},700);
-  }
+  killBurst=killBurst.filter(v=>t-v<0.6);
+  killsSinceLetter++;
+  if(!feedSeen||deathPending||!letterFree())return;
+  let go=false;
+  if(!deathSeen)go=killsSinceLetter>=3&&sinceLetter()>2;
+  else if(sinceLetter()>LETTER_GAP)go=(killBurst.length>=3&&Math.random()<.4)||killsSinceLetter>=30;
+  if(!go)return;
+  killBurst=[];
+  deathPending=setTimeout(()=>{
+    deathPending=0;
+    if(letterFree()&&showLetter('death')){deathSeen=true;killsSinceLetter=0;}
+  },700);
 }
 function installLetters(){
   const upd=G.r1.update.bind(G.r1);
@@ -754,10 +787,7 @@ function openLab(meta={}){
   labLayer.setAttribute('aria-hidden','false');
   gameFrame.classList.add('covered');
   enterLab();
-  if(!labLetterShown){
-    labLetterShown=true;
-    setTimeout(()=>{if(labOpen)showLetter('lab');},450);
-  }
+  setTimeout(()=>{if(labOpen)showLetter('lab');},450);
 }
 
 function closeLab(){
