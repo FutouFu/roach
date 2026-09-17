@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>바퀴벌레</title>
+<title>蟑螂</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#efe8dc;touch-action:none;-webkit-user-select:none;user-select:none}
@@ -26,13 +26,13 @@ iframe{display:block;width:100%;height:100%;border:0;background:#efe8dc}
 </style>
 </head>
 <body>
-<iframe id="gameFrame" title="바퀴 게임" allow="autoplay"></iframe>
+<iframe id="gameFrame" title="蟑螂游戏" allow="autoplay"></iframe>
 <div id="labLayer" aria-hidden="true">
-  <iframe id="labFrame" title="잡은 바퀴벌레" allow="autoplay"></iframe>
-  <button id="labBack" type="button" aria-label="게임으로 돌아가기">돌아가기</button>
+  <iframe id="labFrame" title="捕获的蟑螂" allow="autoplay"></iframe>
+  <button id="labBack" type="button" aria-label="返回游戏">返回</button>
 </div>
 
-<!-- ───────── 인트로 · 바퀴벌레에게서 온 편지 ───────── -->
+<!-- ───────── 开场 · 来自蟑螂的信 ───────── -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Noto+Sans+KR:wght@500;700;800&display=swap">
 <style>
 #intro{position:fixed;inset:0;z-index:45;display:grid;place-items:center;padding:24px 22px calc(24px + env(safe-area-inset-bottom));background:radial-gradient(ellipse at 50% 35%,#ffffff 0%,#e6f1ee 70%,#d3e6e0 100%);transition:opacity .35s}
@@ -78,20 +78,20 @@ iframe{display:block;width:100%;height:100%;border:0;background:#efe8dc}
 
 <div id="intro" hidden>
   <div class="box">
-    <div class="tag">인지행동치료 프로그램</div>
-    <p>본 시뮬레이션은 <b>바퀴벌레에 대한 공포</b>로<br>일상에 어려움을 겪는 분들을 위해<br>제작되었습니다.</p>
-    <p>바퀴벌레를 보고도<br>잡지 못했던 경험이 있으신가요?</p>
-    <p>반복적인 노출과 직접적인 대처 경험은<br>공포를 줄이는 데 도움이 됩니다.</p>
-    <p>지금부터 안전한 환경에서<br>바퀴벌레와 마주하는 연습을 시작합니다.</p>
-    <button id="introGo" type="button">시작하기</button>
+    <div class="tag">认知行为治疗程序</div>
+    <p>本模拟程序 <b>对蟑螂的恐惧</b><br>面向因恐惧而影响日常生活的人们<br>制作完成。</p>
+    <p>即使看到蟑螂<br>你是否有过想抓却不敢抓的经历？</p>
+    <p>反复接触并亲自应对<br>有助于减轻恐惧。</p>
+    <p>从现在开始，在安全的环境中<br>练习面对蟑螂。</p>
+    <button id="introGo" type="button">开始</button>
   </div>
 </div>
 
 <div id="mail" aria-hidden="true">
   <div class="env"></div>
-  <div class="card" role="dialog" aria-label="바퀴벌레에게서 온 편지">
+  <div class="card" role="dialog" aria-label="来自蟑螂的信">
     <div class="top">
-      <div class="ttl">바퀴벌레에게서 온 편지</div>
+      <div class="ttl">来自蟑螂的信</div>
       <div class="stamp"><svg viewBox="0 0 62 78" aria-hidden="true">
         <defs>
           <mask id="mailPerf"><rect width="62" height="78" fill="#fff"/><g fill="#000" id="mailPerfDots"></g></mask>
@@ -123,9 +123,9 @@ iframe{display:block;width:100%;height:100%;border:0;background:#efe8dc}
       </svg></div>
     </div>
     <div class="body" id="mailBody"></div>
-    <div class="from">바퀴벌레가</div>
-    <div class="fact" id="mailFact" hidden><span class="fact-tag">짤막 상식!</span><span id="mailFactText"></span></div>
-    <button id="mailOk" type="button">확인</button>
+    <div class="from">蟑螂</div>
+    <div class="fact" id="mailFact" hidden><span class="fact-tag">小知识！</span><span id="mailFactText"></span></div>
+    <button id="mailOk" type="button">确认</button>
   </div>
 </div>
 
@@ -133,8 +133,8 @@ iframe{display:block;width:100%;height:100%;border:0;background:#efe8dc}
 <div id="error" role="alert"></div>
 
 <script type="module">
-// 족집게 모델은 반드시 게임 창의 three.js로 만들어야 한다.
-// 이 창에서 따로 불러온 three.js로 만든 도형은 게임 렌더러가 읽지 못해 매 프레임 렌더 에러가 나고 화면이 멈춘다.
+// 镊子 모델은 반드시 게임 창의 three.js로 만들어야 한다.
+// 이 창에서 따로 火러온 three.js로 만든 도형은 게임 렌더러가 읽지 못해 매 프레임 렌더 에러가 나고 화면이 멈춘다.
 let THREE=null;
 
 const gameFrame=document.getElementById('gameFrame');
@@ -159,7 +159,7 @@ let pausedBeforeLab=false;
 let tweezerRig=null;
 let lastPointer=null;
 let closeBusy=false;
-let cap=null;               // 집어 드는 중인 바퀴
+let cap=null;               // 집어 드는 중인 蟑螂
 
 const showError=text=>{
   errorEl.textContent=text;
@@ -196,7 +196,7 @@ async function waitForGame(){
     await delay(20);
   }
   boot.classList.add('done');
-  showError('게임 연결에 실패했습니다. game.html과 index.html이 같은 폴더에 있는지 확인해 주세요.');
+  showError('게임 연결에 실패했습니다. 请确认 game.html 和 index.html 位于同一文件夹。');
 }
 
 gameFrame.addEventListener('load',()=>{
@@ -205,20 +205,20 @@ gameFrame.addEventListener('load',()=>{
   waitForGame();
 });
 
-// ───────── 인트로 · 바퀴벌레에게서 온 편지 ─────────
+// ───────── 开场 · 来自蟑螂的信 ─────────
 const LETTER={
-  feed:{color:'#8fd1b8',lines:['바퀴벌레의 삶을','내 자식들에게도 물려줘야지']},
-  death:{color:'#f5a8b8',lines:['하지만,','사랑이 이긴다']},
-  lab:{color:'#9cc8f0',lines:['우리를 더 잘 알게 되면,','더 이상 무섭지 않을걸요?'],facts:[
-    '바퀴벌레는 머리가 없어도\n일주일을 살 수 있어요.',
-    '머리 없는 바퀴벌레가 결국 죽는 건\n물을 못 마셔서예요.',
-    '바퀴벌레는 먹이 없이도\n한 달쯤 버틸 수 있어요.',
-    '바퀴벌레는 1초에\n자기 몸길이의 50배를 달려요.',
-    '바퀴벌레는 동전 두께 틈에도\n몸을 납작하게 눌러 들어가요.',
-    '바퀴벌레는 숨을 40분 동안\n참을 수 있어요.',
-    '알집 하나에는 알이\n30~40개 들어 있어요.',
-    '바퀴벌레의 피는 빨갛지 않아요.\n거의 투명해요.',
-    '바퀴벌레의 조상은 3억 년 전\n화석에서도 발견돼요.',
+  feed:{color:'#8fd1b8',lines:['把蟑螂的一生','也要传给我的孩子们']},
+  death:{color:'#f5a8b8',lines:['但是，','爱会获胜']},
+  lab:{color:'#9cc8f0',lines:['如果你更了解我们，','就不会再害怕了吧？'],facts:[
+    '蟑螂即使没有头，也能存活一周。',
+    '没有头的蟑螂最终会死亡，是因为无法喝水。',
+    '蟑螂即使没有食物，也能坚持大约一个月。',
+    '蟑螂每秒可以跑到自身长度的 50 倍。',
+    '蟑螂可以压扁身体，钻进硬币厚度的缝隙。',
+    '蟑螂可以屏住呼吸 40 分钟。',
+    '一个卵鞘中有 30～40 枚卵。',
+    '蟑螂的血不是红色的，几乎是透明的。',
+    '蟑螂的祖先甚至可以在 3 亿年前的化石中找到。',
   ]},
 };
 const LETTER_GAP=40;                    // 편지끼리 최소 간격(초)
@@ -273,7 +273,7 @@ function sfxMailOut(){
   mTone(1175,.05,.25,.1);mTone(1568,.12,.35,.1);
 }
 
-// 상식은 한 바퀴 다 보여 줄 때까지 겹치지 않게 뽑는다
+// 상식은 한 蟑螂 다 보여 줄 때까지 겹치지 않게 뽑는다
 let factBag=[];
 function pickFact(list){
   if(!factBag.length)factBag=list.slice().sort(()=>Math.random()-.5);
@@ -326,7 +326,7 @@ const letterFree=()=>G&&G.state==='r1'&&!labOpen&&!mailOpen&&!introActive&&!cap;
 const sinceLetter=()=>performance.now()/1000-lastLetterAt;
 let deathSeen=false, killsSinceLetter=0;
 
-// 먹이: 바퀴가 먹이에 입을 대고 1초쯤 먹으면 검사. 처음은 반드시, 이후엔 간격이 지났을 때 가끔.
+// 먹이: 蟑螂가 먹이에 입을 대고 1초쯤 먹으면 검사. 처음은 반드시, 이후엔 간격이 지났을 때 가끔.
 function watchFeeding(dt){
   if(!G||G.state!=='r1')return;
   for(const r of G.r1.roaches){
@@ -344,8 +344,8 @@ function watchFeeding(dt){
   }
 }
 // 죽음: 먹이 편지를 본 뒤에만.
-// 첫 번째는 먹이 편지를 닫고 세 마리째 죽일 때 반드시 뜬다.
-// 이후엔 간격이 지난 뒤 한 번에 여러 마리를 죽이면 가끔, 아니면 30마리째마다 뜬다.
+// 첫 번째는 먹이 편지를 닫고 세 只째 죽일 때 반드시 뜬다.
+// 이후엔 간격이 지난 뒤 한 번에 여러 只를 죽이면 가끔, 아니면 30只째마다 뜬다.
 function watchKill(){
   const t=performance.now()/1000;
   killBurst.push(t);
@@ -422,7 +422,7 @@ function sfxLift(){
   GSFX.noise({dur:.18,gain:.16,freq:700,q:.9,freqEnd:2400});
 }
 
-// ───────── 족집게 모델 ─────────
+// ───────── 镊子 모델 ─────────
 function steelMaterial(color=0xb9bec2){
   return new THREE.MeshStandardMaterial({color,roughness:.28,metalness:.5});
 }
@@ -473,7 +473,7 @@ function camYaw(){
   return Math.atan2(up.x,up.z);
 }
 
-// 족집게 끝(두 집게 끝)이 target에 오도록 족집게 전체를 놓는다.
+// 镊子 끝(두 집게 끝)이 target에 오도록 镊子 전체를 놓는다.
 function placeTweezerTip(x,y,z,pitch,yaw=camYaw()){
   const rig=tweezerRig;
   rig.rotation.set(pitch,yaw,0);
@@ -502,7 +502,7 @@ function selectTweezer(){
   if(!G||G.state!=='r1')return;
   G.r1.cancel?.();
   G.r1.selectItem('tweezer');
-  G.ui.hint?.('살아 있는 바퀴벌레 한 마리를 누르면 집어 올립니다.',2.2,0,true);
+  G.ui.hint?.('点击一只活蟑螂即可夹起。',2.2,0,true);
   preloadLab();
   if(lastPointer)pointTweezerAt(lastPointer.x,lastPointer.y,lastPointer.type==='mouse');
 }
@@ -542,7 +542,7 @@ function missSnap(sx,sy){
     tweezerRig.userData.setGrip(0);
     if(!(lastPointer&&lastPointer.type==='mouse'))tweezerRig.visible=false;
   },140);
-  G.ui.hint?.('바퀴벌레 몸통을 정확히 눌러 주세요.',1.35,0,true);
+  G.ui.hint?.('请准确点击蟑螂的身体。',1.35,0,true);
 }
 
 function captureAt(sx,sy,pointerType){
@@ -553,7 +553,7 @@ function captureAt(sx,sy,pointerType){
 }
 
 // ───────── 집어 올리기 ─────────
-// 0 ~ .13초: 집게가 벌어진 채 내려온다 / .13 ~ .21초: 딸깍 집는다 / .21 ~ .85초: 버둥대는 바퀴를 들어 올린다
+// 0 ~ .13초: 집게가 벌어진 채 내려온다 / .13 ~ .21초: 딸깍 집는다 / .21 ~ .85초: 버둥대는 蟑螂를 들어 올린다
 const CAP_DOWN=.13, CAP_GRIP=.21, CAP_LIFT=.85;
 
 function startCapture(r){
@@ -590,7 +590,7 @@ function updateCapture(dt){
     tipY=lerp(.024,.62,ease(k));grip=1;pitch=lerp(-.72,-.95,k);
     if(!c.lifted){c.lifted=true;sfxLift();}
   }
-  // 들어 올릴 때 족집게가 살짝 흔들린다 (바퀴가 버둥대는 반동)
+  // 들어 올릴 때 镊子가 살짝 흔들린다 (蟑螂가 버둥대는 반동)
   const wob=t>CAP_GRIP?Math.sin(t*38)*.012*clamp((t-CAP_GRIP)*4):0;
   placeTweezerTip(c.x+wob,tipY,c.z,pitch,c.yaw+wob*2);
   tweezerRig.userData.setGrip(grip);
@@ -615,7 +615,7 @@ function updateCapture(dt){
     if(labState==='ready'){
       finishCapture();
     }else{
-      labPendingOpen=true;          // 실험실이 아직 안 떴으면 바퀴를 든 채 계속 버둥대게 둔다
+      labPendingOpen=true;          // 실험실이 아직 안 떴으면 蟑螂를 든 채 계속 버둥대게 둔다
     }
   }
 }
@@ -638,8 +638,8 @@ function addTweezerSlot(){
   const slot=doc.createElement('div');
   slot.id='tweezer-slot';
   slot.className='slot';
-  slot.textContent='족집게';
-  slot.title='족집게 (T)';
+  slot.textContent='镊子';
+  slot.title='镊子（T）';
   slot.addEventListener('pointerdown',e=>{
     e.stopPropagation();
     e.preventDefault();
@@ -750,7 +750,7 @@ function installTweezerMode(){
 }
 
 // ───────── 실험실 ─────────
-// 잡을 때마다 새로 불러오면 매번 로딩 공백이 생긴다. 족집게를 처음 고를 때 한 번만 불러 두고 재운다.
+// 잡을 때마다 새로 火러오면 매번 로딩 공백이 생긴다. 镊子를 처음 고를 때 한 번만 火러 두고 재운다.
 function preloadLab(){
   if(labState!=='none')return;
   labState='loading';
@@ -806,7 +806,7 @@ function closeLab(){
     G.sleep=false;
     G.paused=pausedBeforeLab;
     G.r1.touch?.();
-    G.ui.hint?.('족집게로 다른 바퀴벌레도 집을 수 있습니다.',1.6,.1,true);
+    G.ui.hint?.('也可以用镊子夹起其他蟑螂。',1.6,.1,true);
   }
   setTimeout(()=>{closeBusy=false;},160);
 }
