@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>바퀴</title>
+<title>蟑螂</title>
 <style>
 :root{
   --ivory:#FBF4E4; --ivory2:#F3E9CF; --ink:#3A2412; --ink2:#6A4526; --edge:#C9A86C;
@@ -71,7 +71,7 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;marg
 /* 미니맵 */
 #mini{position:fixed;right:calc(12px + env(safe-area-inset-right));top:calc(12px + env(safe-area-inset-top));width:88px;height:132px;border-radius:8px;background:rgba(22,14,7,.82);border:1px solid rgba(251,244,228,.3);box-shadow:0 2px 12px rgba(0,0,0,.55);display:none;pointer-events:none}
 #mini.show{display:block}
-/* 알집 상태 */
+/* 卵鞘 상태 */
 #eggbar{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%);padding:7px 14px;border-radius:999px;background:rgba(20,12,6,.55);color:#F3E9CF;font-size:14px;font-weight:600;line-height:1;letter-spacing:-.01em;display:none;pointer-events:none;white-space:nowrap}
 #eggbar.show{display:block}
 #eggbar.warn{background:rgba(150,30,20,.72)}
@@ -165,11 +165,11 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;marg
   <div id="r1ui">
     <div id="wcol"></div>
     <div id="bcol"></div>
-    <div id="kills"><span class="n">0</span><small>마리</small></div>
-    <div id="quit">그만할까?</div>
+    <div id="kills"><span class="n">0</span><small>只</small></div>
+    <div id="quit">要停止吗？</div>
     <div id="confirm">
-      <button class="stop">그만하기</button>
-      <button class="more">계속하기</button>
+      <button class="stop">停止</button>
+      <button class="more">继续</button>
     </div>
   </div>
 
@@ -178,8 +178,8 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;marg
     <div id="eggbar"></div>
 
     <div id="pad">
-      <button id="egg" class="rbtn">알 낳기</button>
-      <button id="dash" class="rbtn">달리기</button>
+      <button id="egg" class="rbtn">产卵</button>
+      <button id="dash" class="rbtn">奔跑</button>
     </div>
 
     <div id="tapfx"></div>
@@ -197,8 +197,8 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;marg
     <div class="now"></div>
     <div class="sub"></div>
     <div class="list"></div>
-    <div class="again">화면을 누르면 같은 조건으로 다시</div>
-    <button class="allover">처음부터</button>
+    <div class="again">点击屏幕，以相同条件重新开始</div>
+    <button class="allover">从头开始</button>
   </div>
 
 
@@ -231,25 +231,25 @@ const OBST=[
   {n:'chair',x1:-1.1,z1:-2.3,x2:-0.7,z2:-1.9,h:0.45,roach:true,human:false},
   {n:'shelf',x1:0.2,z1:-3,x2:0.9,z2:-2.7,h:1.8,roach:false,human:false},
   {n:'trash',x1:0.43,z1:2.36,x2:1.0,z2:2.85,h:0.5,roach:false,human:false},   // 봉지 두 개가 삐져나온 만큼까지
-  {n:'slippers',x1:0.46,z1:-1.42,x2:0.74,z2:-0.92,h:0.04,roach:false,human:true},   // 침대 앞 슬리퍼 — 바퀴가 뚫고 지나가지 않게
-  {n:'door',x1:1.02,z1:2.9,x2:2,z2:3,h:2.1,roach:false,human:true},   // 문짝·문틀 두께 — 바퀴가 문 속으로 파고들지 않게
+  {n:'slippers',x1:0.46,z1:-1.42,x2:0.74,z2:-0.92,h:0.04,roach:false,human:true},   // 침대 앞 拖鞋 — 蟑螂가 뚫고 지나가지 않게
+  {n:'door',x1:1.02,z1:2.9,x2:2,z2:3,h:2.1,roach:false,human:true},   // 문짝·문틀 두께 — 蟑螂가 문 속으로 파고들지 않게
 ];
-// 숨는 자리: 구멍 5곳 + 방석 밑 + 책상 밑. 사람은 이 자리들을 차례로 뒤진다.
+// 숨는 자리: 구멍 5곳 + 坐垫下面 + 桌子下面. 사람은 이 자리들을 차례로 뒤진다.
 const HOLES=[
-  {n:'fridge',label:'냉장고 밑',x:-1.52,z:0.55,dx:1,dz:0,hole:true},
-  {n:'sink',label:'싱크대 밑',x:-1.52,z:1.7,dx:1,dz:0,hole:true},
-  {n:'drain',label:'하수구',x:-1.78,z:2.8,dx:0.93,dz:-0.37,hole:true},
-  {n:'crack',label:'벽지 틈',x:1.94,z:0.2,dx:-1,dz:0,hole:true},
-  {n:'shelf',label:'책장 뒤',x:0.55,z:-2.66,dx:0,dz:1,hole:true},
-  {n:'cushion',label:'방석 밑',x:0.1,z:-0.4,dx:0,dz:1,r:0.2,cushion:true},
-  {n:'desk',label:'책상 밑',x:-0.9,z:-2.7,dx:0,dz:1,rect:true,rx:0.66,rz:0.27},
+  {n:'fridge',label:'冰箱下面',x:-1.52,z:0.55,dx:1,dz:0,hole:true},
+  {n:'sink',label:'水槽下面',x:-1.52,z:1.7,dx:1,dz:0,hole:true},
+  {n:'drain',label:'下水道',x:-1.78,z:2.8,dx:0.93,dz:-0.37,hole:true},
+  {n:'crack',label:'墙纸缝隙',x:1.94,z:0.2,dx:-1,dz:0,hole:true},
+  {n:'shelf',label:'书架后面',x:0.55,z:-2.66,dx:0,dz:1,hole:true},
+  {n:'cushion',label:'坐垫下面',x:0.1,z:-0.4,dx:0,dz:1,r:0.2,cushion:true},
+  {n:'desk',label:'桌子下面',x:-0.9,z:-2.7,dx:0,dz:1,rect:true,rx:0.66,rz:0.27},
 ];
 const HOLE_LIST=HOLES.filter(h=>h.hole);
 const CUSHION=HOLES.find(h=>h.n==='cushion');
 const HOLE_R=0.17;
 const inSpot=(h,x,z)=>h.rect?(Math.abs(x-h.x)<h.rx&&Math.abs(z-h.z)<h.rz):dist2(x,z,h.x,h.z)<(h.r||HOLE_R)*(h.r||HOLE_R);
 function spotAt(x,z){ for(const h of HOLES){ if(inSpot(h,x,z)) return h; } return null; }
-const ROACH_L=0.13;           // 바퀴 몸길이 (연출상 실물의 3배쯤 — 폰에서 손가락으로 잡히는 크기)
+const ROACH_L=0.13;           // 蟑螂 몸길이 (연출상 실물의 3배쯤 — 폰에서 손가락으로 잡히는 크기)
 const LAMP_POS=new THREE.Vector3(-0.55,1.08,-2.72);
 const SWITCH_STAND={x:0.2,z:2.55};
 const BEDSIDE={x:0.55,z:-1.55};
@@ -314,7 +314,7 @@ class AudioFX{
   stopLoop(name){ const L=this.loops[name]; if(!L) return; const c=this.ctx; L.g.gain.cancelScheduledValues(c.currentTime); L.g.gain.setValueAtTime(L.g.gain.value||0.5,c.currentTime); L.g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+0.12); setTimeout(()=>{L.nodes.forEach(n=>{try{n.stop();}catch(e){}});},200); delete this.loops[name]; }
   setLoopGain(name,v){ const L=this.loops[name]; if(!L) return; L.g.gain.setTargetAtTime(Math.max(0.0001,v),this.ctx.currentTime,0.05); }
 
-  // ── 바퀴가 눌려 죽는 소리. 1라운드와 2라운드가 같은 소리다. ──
+  // ── 蟑螂가 눌려 죽는 소리. 1라운드와 2라운드가 같은 소리다. ──
   // bright: 1이면 위에서 내려다보며 듣는 소리(파작·바삭), 낮을수록 바닥에서 가까이 듣는 소리(고역이 눌리고 저역이 남는다)
   kill(weapon,combo=0,mult=1,delay=0,pan=0,bright=1){
     if(!this.ctx) return;
@@ -424,7 +424,7 @@ class AudioFX{
       return;
     }
 
-    // 스프레이와 독 먹이: 큰 한 방보다 운동 회로가 하나씩 끊기는 소리
+    // 喷雾剂와 독 먹이: 큰 한 방보다 운동 회로가 하나씩 끊기는 소리
     for(let i=0;i<14;i++){
       const t=0.08+i*(0.09+Math.random()*0.055);
       this.noise({t,dur:0.012+Math.random()*0.016,gain:0.18+Math.random()*0.12,freq:2100+Math.random()*3300,q:2.5,pan:rand(-0.75,0.75)});
@@ -450,7 +450,7 @@ class AudioFX{
   toxWarn(){ if(!this.ctx) return; this.tone({dur:0.18,gain:0.1,freq:210,freqEnd:150,type:'sawtooth'}); }
 }
 const SFX=new AudioFX();
-// 휴대폰 브라우저는 손가락을 '뗄 때'만 소리 재생을 허락한다. 누를 때만 깨우면 끝까지 무음이 된다.
+// 휴대폰 브라우저는 손가락을 '取下时'만 소리 재생을 허락한다. 누를 때만 깨우면 끝까지 무음이 된다.
 for(const ev of ['pointerdown','pointerup','touchend','click','keydown']) window.addEventListener(ev,()=>SFX.ensure(),{capture:true,passive:true});
 
 // ───────── 바닥 페인트 (장판 위 얼룩·시체·그을음·미끼) ─────────
@@ -497,7 +497,7 @@ class FloorPaint{
 
 
   corpse(x,z,heading,L,mode='crushed'){
-    // 시체 몸통은 3D로 따로 남으므로(청소기로 빨아 갈 수 있게) 바닥에는 밴 얼룩과 진물만 그린다
+    // 시체 몸통은 3D로 따로 남으므로(吸尘器로 빨아 갈 수 있게) 바닥에는 밴 얼룩과 진물만 그린다
     const g=this.g, [cx,cy]=this.px(x,z), S=ROACH_L*this.ppm;
     g.save(); g.translate(cx,cy); g.rotate(Math.PI-heading);
     const burnt=mode==='burnt';
@@ -557,7 +557,7 @@ const MAT={
   roachSeam:M.std(0x160b04,{roughness:0.9}),
   corpse:M.std(0xffffff,{roughness:0.92}),
   corpseWing:M.std(0xffffff,{roughness:0.8}),
-  // 새 바퀴 모델: 색은 정점에 들어 있고 재질은 광택만 정한다
+  // 새 蟑螂 모델: 색은 정점에 들어 있고 재질은 광택만 정한다
   roachShell:new THREE.MeshPhysicalMaterial({color:0xffffff,vertexColors:true,roughness:0.4,metalness:0,clearcoat:0.65,clearcoatRoughness:0.24}),
   roachLimb:new THREE.MeshStandardMaterial({color:0xffffff,vertexColors:true,roughness:0.46}),
   nymphShell:new THREE.MeshPhysicalMaterial({color:0xffffff,vertexColors:true,roughness:0.5,clearcoat:0.45,clearcoatRoughness:0.35}),
@@ -670,7 +670,7 @@ function buildRoom(scene){
 }
 
 
-// 알집(난협): 옆으로 납작한 강낭콩·동전지갑 모양. 등에는 톱니 진 솔기, 옆면엔 알 칸마다 희미한 골이 진다. 긴 쪽이 x축.
+// 卵鞘(난협): 옆으로 납작한 강낭콩·동전지갑 모양. 등에는 톱니 진 솔기, 옆면엔 알 칸마다 희미한 골이 진다. 긴 쪽이 x축.
 let _ootheca=null;
 function oothecaGeo(){
   if(_ootheca) return _ootheca;
@@ -720,12 +720,12 @@ function makeItem(kind){
   return g;
 }
 
-// ───────── 바퀴벌레 (이질바퀴) ─────────
-// 몸 좌표: +z 머리, +y 위, x 좌우. 몸길이 약 1.2단위 = 실제 ROACH_L×1.2.
-// 실험실 표본과 같은 종으로 맞춘다: 적갈색 광택, 앞가슴 등판은 옅은 테두리 안에 짙은 나비 무늬, 가시 돋친 납작한 다리.
-const ROACH_TOP=0.15;   // 등(날개 위) 높이 — 뒤집힌 바퀴를 바닥에 눕힐 때 쓴다
+// ───────── 蟑螂 (이질蟑螂) ─────────
+// 몸 좌표: +z 头部, +y 위, x 좌우. 몸길이 약 1.2단위 = 실제 ROACH_L×1.2.
+// 실험실 표본과 같은 종으로 맞춘다: 적갈색 광택, 前胸背板은 옅은 테두리 안에 짙은 나비 무늬, 가시 돋친 납작한 다리.
+const ROACH_TOP=0.15;   // 등(날개 위) 높이 — 뒤집힌 蟑螂를 바닥에 눕힐 때 쓴다
 // yaw: 넓적다리가 뻗는 방향(0=앞, π=뒤), ky: 무릎에서 종아리가 더 꺾이는 각도(+면 뒤로).
-// 앞다리는 앞으로, 가운데·뒷다리는 뒤로 꺾여야 바퀴 윤곽이 나온다.
+// 前足는 앞으로, 가운데·后足는 뒤로 꺾여야 蟑螂 윤곽이 나온다.
 const LEG_DEF=[
   {z:0.30, yaw:0.75, ky:-0.35, fl:0.28, tl:0.30, w:0.85, tar:0.15},
   {z:0.06, yaw:1.90, ky:0.60,  fl:0.34, tl:0.40, w:1.0,  tar:0.19},
@@ -805,7 +805,7 @@ const ROACH_PAL={
 const _palRGB=new Map();
 function palRGB(pal){ if(_palRGB.has(pal)) return _palRGB.get(pal); const o={}; for(const k in pal){ const v=pal[k]; o[k]=typeof v==='object'?Object.fromEntries(Object.entries(v).map(([a,b])=>[a,rgb(b)])):(k==='veinK'?v:rgb(v)); } _palRGB.set(pal,o); return o; }
 
-// 앞가슴 등판 — 실험실 표본과 같은 방패 모양. 머리 쪽은 반원, 배 쪽은 완만한 D자, 가장자리는 얇게 들린다.
+// 前胸背板 — 실험실 표본과 같은 방패 모양. 头部 쪽은 반원, 배 쪽은 완만한 D자, 가장자리는 얇게 들린다.
 const _proGeo=new Map();
 function pronotumGeo(pal){
   if(_proGeo.has(pal)) return _proGeo.get(pal);
@@ -859,7 +859,7 @@ function addAbdomen(B,pal,o={}){
     else { c=rgbMix(C.abV,C.abEdge,sstep(0.75,1,co)*0.5); c=rgbMix(c,C.abBand,sstep(0.82,0.96,f)*0.9); c=rgbMix(c,C.abMem,sstep(0.12,0,f)*0.7); }
     return c; },null,o.warp,o.M,o.post);
 }
-// 앞날개(겉날개) 한 장. side +1 / -1. 오른쪽 날개(-1)가 위로 겹친다.
+// 앞날개(겉날개) 한 장. side +1 / -1. 右侧 날개(-1)가 위로 겹친다.
 function addWing(B,pal,side,o={}){
   const C=palRGB(pal), uMax=o.uMax??1, z0=0.22, z1=-0.64, lift=side<0?0.007:0, T=0.007;
   const shape=(u,v)=>{ const te=clamp((u-0.76)/0.24,0,1); const hs=(0.035+0.095*Math.pow(Math.max(0,Math.sin(Math.PI*clamp(u*0.95+0.08,0,0.86))),0.45))*Math.sqrt(Math.max(0.0004,1-te*te));
@@ -905,7 +905,7 @@ function addFemur(B,i,pal,M){
     const dir=V3(Math.cos(0.75),Math.sin(0.75)*Math.cos(a)*0.55,Math.sin(0.75)*Math.sin(a)).normalize();
     addSpine(B,C.spine,t*L,Math.cos(a)*r*0.5,Math.sin(a)*r,dir,0.028*w,0.0055*w,M); }
 }
-// 종아리 + 발목마디 5개 + 발톱. 종아리엔 굵은 가시가 사방으로 돋는다.
+// 종아리 + 발목마디 5개 + 爪. 종아리엔 굵은 가시가 사방으로 돋는다.
 function addTibia(B,i,pal,M){
   const C=palRGB(pal), d=LEG_DEF[i], w=d.w, L=d.tl;
   const g=limbGeo(L,0.019*w,0.0125*w,0.72,6,4);
@@ -1016,7 +1016,7 @@ function makeHuman(){
 }
 // ───────── 시체 ─────────
 // 한 구 = 몸통 변형(껍데기 + 짜낸 내장, 변형마다 인스턴스 한 묶음) + 다리 6개(따로 인스턴스).
-// 막 죽은 시체는 다리가 한동안 경련한다. 청소기는 시체를 빨아들이지만 바닥에 밴 진물은 남는다.
+// 막 죽은 시체는 다리가 한동안 경련한다. 吸尘器는 시체를 빨아들이지만 바닥에 밴 진물은 남는다.
 const CORPSE_VARIANTS={crushed:8,belly:4,burnt:4};
 const GOO_RGB=[0xEFE6CF,0xE6D9B6,0xDCC89A,0xF5EFDF,0xD2BC88].map(rgb);
 const GUT_RGB=[rgb(0x6e3c1a),rgb(0x3a1d0b),rgb(0xa06a3a)];
@@ -1048,12 +1048,12 @@ function buildCorpseGeo(mode,v){
     addAbdomen(shell,pal,{v0:vs+0.04,v1:vs2,warp:crush(0.014),M:midM});
     addAbdomen(shell,pal,{v0:vs2+0.04,v1:1,warp:crush(0.012),M:rearM});
     addCerci(shell,pal,{warp:crush(0.004,0.8),M:rearM});
-    // 앞가슴 등판: 금이 가서 한쪽이 들린다
+    // 前胸背板: 금이 가서 한쪽이 들린다
     const ca=R(0,Math.PI), cn=[Math.cos(ca),Math.sin(ca)], co=R(-0.04,0.04);
     const crackD=(w)=>w.x*cn[0]+(w.z-0.3)*cn[1]-co;
     const proM=pivotM(0,0.05,0.3,R(-0.12,0.08),R(-0.4,0.4),(R0()<0.5?-1:1)*R(0.12,0.4),R(-0.04,0.04),0,R(0.02,0.07));
     addPronotum(shell,pal,{M:proM,warp:(w)=>{ const d=crackD(w); crush(0.006,0.5)(w); if(d>0){ w.y+=0.016; w.x+=cn[0]*0.018; w.z+=cn[1]*0.018; } },post:(c,w)=>Math.abs(crackD(w))<0.014?rgbMul(c,0.3):c});
-    // 머리: 앞으로 짜여 나가거나 떨어져 나간다
+    // 头部: 앞으로 짜여 나가거나 떨어져 나간다
     const detach=R0()<0.5, hd=detach?R(0.14,0.26):R(0.05,0.1), ha=R(-0.8,0.8);
     const headM=pivotM(0,0.03,0.42,R(-0.4,0.4),ha,R(-0.5,0.5),Math.sin(ha)*hd,-0.01,Math.cos(ha)*hd);
     addHead(shell,pal,{M:headM,warp:crush(0.004,0.7)});
@@ -1096,7 +1096,7 @@ function buildCorpseGeo(mode,v){
     for(let k=0;k<6;k++){ const i=k%3, s=k<3?1:-1, d=LEG_DEF[i];
       legs.push({i,style:'curl',x:-s*0.13*Math.cos(roll),y:hy,z:d.z,ry:legYaw(i,-s,R(-0.3,0.3)),rz:R(0.75,1.25),rx:R(-0.35,0.35),tw:R(0.7,1.2)}); }
   } else {
-    // 불: 까맣게 그을고 쪼그라든다. 날개는 타서 오그라들고, 배 끝이 말려 올라간다
+    // 火: 까맣게 그을고 쪼그라든다. 날개는 타서 오그라들고, 배 끝이 말려 올라간다
     const sd=R(0,50);
     const charPost=(c,w)=>{ const n=vnoise(w.x*34+sd,w.y*34,w.z*34), lum=(c[0]+c[1]+c[2])/3; let o=rgbMix(rgb(0x120c08),rgb(0x3a1a0a),clamp(lum*3,0,1)*0.6); if(n>0.74) o=rgbMix(o,rgb(0x6f6a66),(n-0.74)*3); else if(n<0.22) o=rgbMix(o,rgb(0x6a2a0e),(0.22-n)*2.5); return o; };
     const shrink=(w)=>{ w.x*=0.9; w.y*=0.92; w.z*=0.93; if(w.z<-0.12){ const t=(-0.12-w.z)/0.45; w.y+=0.1*t*t; } };
@@ -1146,7 +1146,7 @@ class Corpses{
   placeLegs(c,B){
     const k=c.tw>0?clamp(c.tw/2,0,1):0, d=this.d;
     for(const g of c.legs){ const L=g.L, a=k*L.tw;
-      // 경련: 불규칙하게 튀었다가 잦아든다
+      // 경련: 火규칙하게 튀었다가 잦아든다
       const j=a?Math.sin(c.t*g.f+g.ph)*Math.max(0,Math.sin(c.t*2.3+g.ph*1.7))*a:0;
       const bellyRun=c.mode==='belly'?Math.sin(c.t*g.f*0.8+g.ph)*0.35*a:0;
       d.position.set(L.x,L.y,L.z); d.rotation.set(L.rx,L.ry+j*0.35+bellyRun,L.rz+j*0.45+Math.abs(bellyRun)*0.6,'YXZ'); d.scale.setScalar(1); d.updateMatrix();
@@ -1157,7 +1157,7 @@ class Corpses{
     for(const c of this.twitching){ c.t+=dt; c.tw-=dt; if(!c.alive){ this.twitching.delete(c); continue; } if(c.tw<=0){ c.tw=0; this.twitching.delete(c); } this.placeLegs(c,this.base(c,this.m4)); }
   }
   drop(c){ if(!c.alive) return; c.alive=false; this.release(c.V.shell,c.si); if(c.V.goo) this.release(c.V.goo,c.gi); for(const g of c.legs) this.release(g.m,g.i); this.twitching.delete(c); }
-  // 청소기: 흡입 범위 안의 시체를 노즐 쪽으로 끌어오다가 가까우면 빨아들인다. 바닥에 밴 진물 자국은 남는다.
+  // 吸尘器: 흡입 범위 안의 시체를 노즐 쪽으로 끌어오다가 가까우면 빨아들인다. 바닥에 밴 진물 자국은 남는다.
   suck(hx,hz,inside,dt){
     let eaten=0;
     for(const c of this.list){ if(!c||!c.alive||!inside(c.x,c.z)) continue;
@@ -1169,8 +1169,8 @@ class Corpses{
 }
 
 // ───────── 입력 ─────────
-// 1라운드: 닿는 손가락마다 그 자리 행동(양손 연타 가능). 두 손가락 이상이 함께 끌리면 화면 이동. 마우스는 왼쪽 = 행동, 오른쪽 끌기 = 화면 이동.
-// 2라운드: 왼쪽 절반에 손가락을 대면 그 자리에 스틱이 생긴다. 손을 떼면 스틱은 기본 자리로 돌아가 흐리게 떠 있다.
+// 1라운드: 닿는 손가락마다 그 자리 행동(양손 연타 가능). 두 손가락 이상이 함께 끌리면 화면 이동. 마우스는 左侧 = 행동, 右侧 끌기 = 화면 이동.
+// 2라운드: 左侧 절반에 손가락을 대면 그 자리에 스틱이 생긴다. 손을 떼면 스틱은 기본 자리로 돌아가 흐리게 떠 있다.
 class Input{
   constructor(canvas){
     this.canvas=canvas; this.keys=new Set(); this.pointers=new Map();
@@ -1266,7 +1266,7 @@ class Splatter{
   }
 }
 
-// ───────── 뿌리기/불꽃/흡입 입자 ─────────
+// ───────── 뿌리기/火꽃/흡입 입자 ─────────
 class Puffs{
   constructor(scene){
     this.n=180; const geo=new THREE.SphereGeometry(1,8,6);
@@ -1642,7 +1642,7 @@ const ITEMS={
   rice:{bait:{radius:1.8,amount:18,spread:0.10,boost:5},hover:0.16},
 };
 const SLOT_ORDER=['hand','slipper','tissue','book','pan','spray','flame','vacuum'];
-const LABEL={hand:'맨손',slipper:'슬리퍼',tissue:'휴지',book:'책',pan:'프라이팬',spray:'스프레이',flame:'불',vacuum:'청소기',bone:'닭뼈',cola:'콜라',rice:'밥'};
+const LABEL={hand:'徒手',slipper:'拖鞋',tissue:'纸巾',book:'书',pan:'平底锅',spray:'喷雾剂',flame:'火',vacuum:'吸尘器',bone:'鸡骨头',cola:'可乐',rice:'米饭'};
 const BAIT_SLOTS=['bone','cola','rice'];
 const LETHAL_ORDER=['hand','tissue','slipper','book','pan','vacuum','spray','flame'];
 const ROACH_R=0.05;
@@ -1677,7 +1677,7 @@ class Round1{
     this.lastAction=0;
 
     this.G.ui.hint(
-      '도구를 고른 뒤 바퀴가 있는 곳을 누른다.',
+      '选择工具后，点击蟑螂所在的位置。',
       3.2,
       1.8,
       true
@@ -1685,8 +1685,8 @@ class Round1{
 
     this.G.ui.hint(
       this.G.isTouch
-        ? '두 손가락 드래그: 화면 이동'
-        : '마우스 오른쪽 드래그: 화면 이동 · 숫자키: 도구 변경',
+        ? '双指拖动：移动视角'
+        : '鼠标右键拖动：移动视角 · 数字键：切换工具',
       3.4,
       0.25,
       true
@@ -2119,8 +2119,8 @@ class Round1{
     this.splat.update(dt); this.puffs.update(dt); this.updateCushion(dt);
 
 
-    // 최소 1마리를 잡은 뒤 7초 쉬었거나,
-    // 40마리를 잡았을 때 종료 선택지를 보여준다.
+    // 최소 1只를 잡은 뒤 7초 쉬었거나,
+    // 40只를 잡았을 때 종료 선택지를 보여준다.
     const canAsk=!this.hold&&!this.strikes.length;
 
     if(
@@ -2205,30 +2205,30 @@ const eggTimeForGen=gen=>
 
 const SPD_MUL=[0.55,0.63,0.7,0.76,0.82,0.87,0.92,0.96];
 
-const josaIda=w=>{ const c=w.charCodeAt(w.length-1)-0xAC00; return (c>=0&&c<11172&&c%28)?'이다':'다'; };
+const josaIda=()=>'';
 const HINTS={
-  goal:'바퀴벌레가 죽어도 알집이 남아 있으면 다음 세대로 이어진다.',
+  goal:'即使蟑螂死亡，只要留下卵鞘，就会延续到下一代。',
 
   moveTouch:
-    '왼쪽 드래그: 이동 · 오른쪽 드래그: 시점 · 오른쪽 톡: 질주',
+    '左键拖动：移动 · 右键拖动：视角 · 右键点击：冲刺',
 
   moveKey:
-    'WASD: 이동 · 마우스 드래그: 시점 · Space: 질주 · E: 알 낳기',
+    'WASD：移动 · 鼠标拖动：视角 · 空格：冲刺 · E：产卵',
 
-  hideIn:(p)=>`${p}에 숨었다. 화면 가장자리가 어두운 동안은 사람 눈에 띄지 않는다.`,
-  hideOut:(p)=>`${p}에서 나왔다. 숨는 자리 안에 있을 때만 사람 눈에 띄지 않는다.`,
+  hideIn:(p)=>`躲在 ${p}。屏幕边缘变暗时不会被人发现。`,
+  hideOut:(p)=>`从 ${p} 出来了。只有躲在藏身处时才不会被人发现。`,
 
   watch:
-    '알집은 남아 있다.',
+    '卵鞘仍然存在。',
 
-  trap:(b)=>`사람이 놓아둔 ${b}${josaIda(b)}. 근처에 오래 머물면 죽는다.`,
+  trap:(b)=>`人放置的 ${b}。在附近停留太久会死亡。`,
 
-  gen:(n)=>`${n}세대`,
+  gen:(n)=>`第 ${n} 代`,
 };
 
 
 
-const BAIT_LABEL={bone:'닭뼈',cola:'콜라',rice:'밥'};
+const BAIT_LABEL={bone:'鸡骨头',cola:'可乐',rice:'米饭'};
 
 // A* 격자 (사람용)
 class NavGrid{
@@ -2267,7 +2267,7 @@ this.deathFX=new DeathFX(G);
 
     this.eggMesh=makeItem('egg'); this.eggMesh.scale.setScalar(1.25); this.eggMesh.visible=false; this.grp.add(this.eggMesh);
     this.hatchMesh=makeItem('egg'); this.hatchMesh.visible=false; this.grp.add(this.hatchMesh);
-    // 내려오는 것의 그림자 — 바퀴에게 유일한 경고
+    // 내려오는 것의 그림자 — 蟑螂에게 유일한 경고
     this.warn=new THREE.Mesh(new THREE.CircleGeometry(1,24),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0,depthWrite:false}));
     this.warn.rotation.x=-Math.PI/2; this.warn.position.y=0.004; this.warn.renderOrder=3; this.warn.visible=false; this.grp.add(this.warn);
     this.ringC=document.createElement('canvas'); this.ringC.width=this.ringC.height=96; this.ringTex=new THREE.CanvasTexture(this.ringC);
@@ -2345,7 +2345,7 @@ this.deathFX=new DeathFX(G);
         this.swarm.heads,
         this.swarm.legs
       ]){
-        this.grp.remove(m);   // 몸통 형상은 산 바퀴와 같이 쓰므로 버리지 않는다
+        this.grp.remove(m);   // 몸통 형상은 산 蟑螂와 같이 쓰므로 버리지 않는다
       }
 
       this.swarm=null;
@@ -2400,7 +2400,7 @@ this.G.room.blanket.visible=true;
     this.ready=false;
     this.laying=0;
 
-    // 현재 세대에 맞는 알집 시간을 저장한다.
+    // 현재 세대에 맞는 卵鞘 시간을 저장한다.
     this.eggT=eggTimeForGen(this.gen);
 
     this.assistW=0;
@@ -2472,7 +2472,7 @@ this.G.room.blanket.visible=true;
       this.spawnHatchNymphs(sx,sz,sh);
     }
 
-    // '사람이 든 것 — 슬리퍼' 대신
+    // '人拿着的物品 — 拖鞋' 대신
     // 제목 아래에 도구 이름만 보여준다.
     G.ui.genLabel(
       HINTS.gen(this.gen+1),
@@ -2488,8 +2488,8 @@ this.G.room.blanket.visible=true;
 
      G.ui.eggBar(
       G.isTouch
-        ? `알집 형성 2초 · 부화까지 ${this.eggT}초`
-        : `E키 2초 · 부화까지 ${this.eggT}초`,
+        ? `卵鞘形成需 2 秒 · 距离孵化 ${this.eggT} 秒`
+        : `按 E 持续 2 秒 · 距离孵化 ${this.eggT} 秒`,
       false
     );
 
@@ -2548,7 +2548,7 @@ this.G.room.blanket.visible=true;
     this.G.room.blanket.visible=true;
     if(this.weaponMesh){ H.hold.remove(this.weaponMesh); this.weaponMesh=null; } if(this.strikeMesh){ this.grp.remove(this.strikeMesh); this.strikeMesh=null; }
     if(this.vac){ this.grp.remove(this.vac); this.grp.remove(this.vacTube); this.vac=null; this.vacTube=null; }
-    // 2세대부터는 사람이 이미 깨어 있다 — 불 켜진 방에서 도구를 든 채, 알이 깬 자리에서 먼 곳에 서 있다
+    // 2세대부터는 사람이 이미 깨어 있다 — 火 켜진 방에서 도구를 든 채, 알이 깬 자리에서 먼 곳에 서 있다
     if(this.gen>0){
       const P=this.p, spots=[[0.35,1.35],[-0.75,-1.05],[0.95,0.35],[0.15,-1.65],[-0.55,1.05],[0.6,-0.4]];
       let best=spots[0],bd=-1; for(const q of spots){ const d=Math.hypot(q[0]-P.x,q[1]-P.z); if(d>bd){ bd=d; best=q; } }
@@ -2584,7 +2584,7 @@ clearTraps(){
 
   }
 
- // ── 부화 직후 주변에 보이는 흰 약충. 사람 AI의 공격 대상에는 넣지 않는다. ──
+ // ── 孵化 직후 주변에 보이는 흰 약충. 사람 AI의 공격 대상에는 넣지 않는다. ──
   clearHatchNymphs(){
     for(const n of this.hatchNymphs) this.grp.remove(n.m.g);
     this.hatchNymphs.length=0;
@@ -2624,7 +2624,7 @@ clearTraps(){
   }
 
 
-  // ── 다른 바퀴들 ──
+  // ── 다른 蟑螂들 ──
   npcTarget(){ return Math.min(30,16+this.gen*2); }
   spawnNpcs(){ this.clearNpcs(); const n=this.npcTarget(); for(let i=0;i<n;i++) this.addNpc(rand(0.3,6)); this.npcT=2; }
   addNpc(delay){ const r=Math.random(); const pool=r<0.7?HOLE_LIST:HOLES.filter(h=>!h.hole); const h=pool[Math.floor(rand(pool.length))]; const m=makeRoach(); m.g.visible=false; this.grp.add(m.g); const n={x:h.x,z:h.z,h:Math.atan2(h.dx,h.dz),spd:0,state:'hide',t:delay,hole:h,m,hidden:true,vx:0,vz:0,turn:0,startle:0,fleeSoon:-1,poison:0,dead:0,slug:Math.random()<0.7,bold:Math.random()<0.35,trap:null,eat:0}; this.npcs.push(n); return n; }
@@ -2645,13 +2645,13 @@ clearTraps(){
       return;
     }
 
-    // 먹이나 살충제로 독사한 배경 바퀴에게
+    // 먹이나 살충제로 독사한 배경 蟑螂에게
     // 압사 파열음을 붙이지 않는다.
     if(weapon==='spray'){
       return;
     }
 
-    // 불도 압사음이 아니라 작은 연소음만 낸다.
+    // 火도 압사음이 아니라 작은 연소음만 낸다.
     if(weapon==='flame'){
       const g=clamp(
         0.32/(0.45+d),
@@ -2675,7 +2675,7 @@ clearTraps(){
       return;
     }
 
-    // 손·슬리퍼·책·프라이팬으로 실제 압사했을 때만.
+    // 손·拖鞋·书·平底锅으로 실제 압사했을 때만.
     SFX.npcCrush(d,pan,weapon);
 
     this.G.shake(
@@ -2699,7 +2699,7 @@ clearTraps(){
   updateNpcs(dt){
     const A=this.ai; let alive=0;
     for(let i=this.npcs.length-1;i>=0;i--){ const n=this.npcs[i], m=n.m;
-      // 죽는 즉시 시체로 바꾼다 (청소기에 빨려 간 것(t=1)은 시체를 남기지 않는다)
+      // 죽는 즉시 시체로 바꾼다 (吸尘器에 빨려 간 것(t=1)은 시체를 남기지 않는다)
       if(n.state==='dead'){ if(!n.baked){ n.baked=true; if(n.t<1){ this.G.paint.corpse(n.x,n.z,n.h,0.45,n.bake||'crushed'); this.G.corpses.add(n.x,n.z,n.h,n.bake||'crushed'); } } this.grp.remove(m.g); this.npcs.splice(i,1); continue; }
       alive++;
       if(n.state==='poison'){ n.t-=dt; n.twitch=(n.twitch||0)+dt*rand(10,30); m.pose(0.6+0.4*Math.sin(n.twitch),dt*rand(0.5,3),0.15); if(n.t<=0) this.killNpc(n,'spray'); continue; }
@@ -2723,7 +2723,7 @@ clearTraps(){
     this.npcT-=dt; if(alive<this.npcTarget()&&this.npcT<=0){ this.addNpc(rand(0.8,3)); this.npcT=rand(0.8,2); }
   }
   // ── 보임/빛 ──
-  litAt(x,z){ return this.ai.lightsOn||x>0.6; }   // 불이 꺼져 있으면 커튼 틈으로 들어오는 창가 쪽만 밝다
+  litAt(x,z){ return this.ai.lightsOn||x>0.6; }   // 火이 꺼져 있으면 커튼 틈으로 들어오는 창가 쪽만 밝다
   canSeeAt(x,z,hidden){ const A=this.ai; if(hidden||!(A.state==='sit'||A.awake)) return false; const dx=x-A.x, dz=z-A.z, d=Math.hypot(dx,dz); if(d>3.2||!this.litAt(x,z)) return false; const a=Math.atan2(dx,dz); return Math.abs(wrapAng(a-A.h-this.human.headYaw))<(A.state==='sit'?1.3:0.95)+(d<0.55?1.2:0); }
   // 트인 바닥에 가만히 서 있으면 사람이 곁눈으로도 알아챈다 (1.4m 안, 0.6초 이상 멈춤)
   canSee(){ const P=this.p, A=this.ai; if(this.phase!=='play') return false; if(this.canSeeAt(P.x,P.z,P.hidden)) return true; return A.awake&&!P.hidden&&(P.stillT||0)>0.6&&this.litAt(P.x,P.z)&&Math.hypot(P.x-A.x,P.z-A.z)<1.4; }
@@ -2833,7 +2833,7 @@ clearTraps(){
       rx,
       rz,
 
-      // 프라이팬을 어느 쪽으로 살짝 휘두를지
+      // 平底锅을 어느 쪽으로 살짝 휘두를지
       swingSide:Math.random()<0.5?-1:1
     };
 
@@ -2861,7 +2861,7 @@ clearTraps(){
 
     if(A.weapon==='pan'){
       /*
-       * 프라이팬 모델의 원점은 팬 바닥 중심이다.
+       * 平底锅 모델의 원점은 팬 바닥 중심이다.
        * 손잡이가 +Z 방향으로 뻗어 있으므로,
        * 팬 바닥을 손보다 앞쪽에 둬야 손잡이 끝이 손에 붙는다.
        */
@@ -2934,7 +2934,7 @@ clearTraps(){
       if(A.weapon==='pan'){
         /*
          * 팬 바닥 중심은 손보다 공격 방향 앞쪽에 둔다.
-         * 따라서 프라이팬 손잡이 끝이 계속 실제 손 쪽에 남는다.
+         * 따라서 平底锅 손잡이 끝이 계속 실제 손 쪽에 남는다.
          */
         const handX=
           this.tmp3.x+
@@ -3126,7 +3126,7 @@ clearTraps(){
   updateVac(){ const A=this.ai, H=this.human; if(!this.vac) return; let nx,nz,nh; if(A.nozzle){ [nx,nz,nh]=A.nozzle; } else { nx=A.x+Math.sin(A.h)*0.55; nz=A.z+Math.cos(A.h)*0.55; nh=A.h; }
     this.vac.position.set(nx,0,nz); this.vac.rotation.set(0,nh,0); H.root.updateWorldMatrix(true,true); H.armR.hand.getWorldPosition(this.tmp); this.tmp2.set(nx,0.05,nz); const mid=this.tmp.clone().add(this.tmp2).multiplyScalar(0.5); const len=this.tmp.distanceTo(this.tmp2); this.vacTube.position.copy(mid); this.vacTube.scale.set(1,len,1); this.vacTube.lookAt(this.tmp); this.vacTube.rotateX(Math.PI/2); }
   inCone(px,pz,x,z,h,len,ang){ const dx=px-x, dz=pz-z, d=Math.hypot(dx,dz); if(d>len) return false; if(d<0.05) return true; return Math.abs(wrapAng(Math.atan2(dx,dz)-h))<ang*(1-0.3*d/len); }
-  // ── 알집 ──
+  // ── 卵鞘 ──
   layTick(dt,holding){ const P=this.p; if(this.egg) return;
     if(holding&&P.spd<0.05){ this.laying+=dt/LAY_T; if(this.laying>=1){ this.placeEgg(); return; } } else this.laying=Math.max(0,this.laying-dt*0.5);
     this.G.ui.eggProgress(this.laying); }
@@ -3136,7 +3136,7 @@ clearTraps(){
     const P=this.p;
     const spot=spotAt(P.x,P.z);
 
-    // 알은 꽁무니 쪽에 놓되, 벽이나 가구 안으로 파고들지 않게 바퀴가 갈 수 있는 자리까지만 (다음 세대가 거기서 태어나므로)
+    // 알은 꽁무니 쪽에 놓되, 벽이나 가구 안으로 파고들지 않게 蟑螂가 갈 수 있는 자리까지만 (다음 세대가 거기서 태어나므로)
     const [ex,ez]=roachMove(P.x,P.z,P.x-Math.sin(P.h)*0.06,P.z-Math.cos(P.h)*0.06);
 
     this.egg={
@@ -3159,7 +3159,7 @@ clearTraps(){
     this.G.ui.eggProgress(0);
     this.G.ui.eggState('laid');
       this.G.ui.eggBar(
-      `부화까지 ${this.eggT}초`,
+      `距离孵化 ${this.eggT} 秒`,
       false
     );
 
@@ -3209,7 +3209,7 @@ clearTraps(){
     // 죽음 장면에서는 일반 UI를 다시 띄우지 않는다.
     if(this.phase!=='dying'){
       this.G.ui.eggBar(
-        `부화까지 ${left}초`,
+        `距离孵化 ${left} 秒`,
         danger
       );
 
@@ -3231,14 +3231,14 @@ clearTraps(){
         this.G.ui.eggReady(true);
         this.G.ui.eggBar(
           this.phase==='watch'
-            ? '부화'
-            : '알집 성숙',
+            ? '孵化'
+            : '卵鞘成熟',
           false
         );
       }
 
       // 살아 있는 동안에는 다음 세대로 넘어가지 않는다.
-      // 먼저 죽어서 알집을 지켜보는 중일 때만 넘어간다.
+      // 먼저 죽어서 卵鞘을 지켜보는 중일 때만 넘어간다.
       if(this.phase==='watch'){
         this.nextGen(650);
       }
@@ -3262,7 +3262,7 @@ clearTraps(){
     let ty=1.12;
     let tz=A.z;
 
-    // 청소기는 노즐을 바라본다.
+    // 吸尘器는 노즐을 바라본다.
     if(type==='vacuum'&&A.nozzle){
       tx=A.nozzle[0];
       ty=0.07;
@@ -3286,7 +3286,7 @@ clearTraps(){
       ty=0.04;
       tz=best.z;
 
-    // 불과 스프레이는 사람이 들고 있는 도구 쪽을 바라본다.
+    // 火과 喷雾剂는 사람이 들고 있는 도구 쪽을 바라본다.
     }else if(
       (type==='flame'||type==='poison')&&
       this.weaponMesh
@@ -3448,7 +3448,7 @@ clearTraps(){
       }
 
     }else{
-      // 스프레이·독 먹이
+      // 喷雾剂·독 먹이
       const fall=clamp(D.t/1.48,0,1);
 
       this.roach.pose(
@@ -3503,19 +3503,19 @@ clearTraps(){
     this.G.camera.up.set(0,1,0);
     this.roach.g.visible=false;
 
-    // 알집을 남기지 못했으면 종료
+    // 卵鞘을 남기지 못했으면 종료
     if(!this.egg){
       this.lineEnd();
       return;
     }
 
-    // 이미 성숙한 알집이 있으면 다음 세대
+    // 이미 성숙한 卵鞘이 있으면 다음 세대
     if(this.ready){
       this.nextGen(450);
       return;
     }
 
-    // 알집은 있지만 아직 성숙하지 않았으면 관전
+    // 卵鞘은 있지만 아직 성숙하지 않았으면 관전
     this.toWatch();
   }
 
@@ -3531,12 +3531,12 @@ clearTraps(){
     this.G.ui.miniOn(true);
 
     this.G.ui.eggBar(
-      `부화까지 ${
+      `距离孵化 ${
         Math.max(
           0,
           Math.ceil(this.eggT-E.t)
         )
-      }초`,
+      } 秒`,
       false
     );
 
@@ -3701,7 +3701,7 @@ clearTraps(){
     let cx=x, cz=z, short=0.37, found=false;
     // 방 경계는 ±1.9 / ±2.9 — 벽에 붙은 문짝·문틀 두께 안으로 카메라가 들어가지 않게
     for(let back=0.42;back>=0.05;back-=0.04){ const tx=clamp(x-fx*back,-1.9,1.9), tz=clamp(z-fz*back,-2.9,2.9); let ok=true; for(const o of OBST){ if(!o.roach&&inObst(o,tx,tz,0.02)){ ok=false; break; } } if(ok){ cx=tx; cz=tz; short=0.42-back; found=true; break; } }
-    // 뒤에 카메라 놓을 자리가 없으면(냉장고·싱크대 밑에 숨었을 때) 가구 몸통 속에 박히지 않게 바닥에 바짝 붙어 밖을 내다본다
+    // 뒤에 카메라 놓을 자리가 없으면(냉장고·水槽下面에 숨었을 때) 가구 몸통 속에 박히지 않게 바닥에 바짝 붙어 밖을 내다본다
     this.camPeek=!found;
     if(!found){ G.camBase.set(x-fx*0.03,0.042,z-fz*0.03); this.tmp.set(x+fx*0.6,0.042+0.6*Math.tan(clamp(pitch,-0.2,0.5)),z+fz*0.6);
       cam.position.copy(G.camBase); cam.up.set(0,1,0); cam.lookAt(this.tmp); cam.updateMatrixWorld();
@@ -3731,7 +3731,7 @@ clearTraps(){
     const rx=fz;
     const rz=-fx;
 
-    // 청소기: 노즐 안으로 끌려가며 회전
+    // 吸尘器: 노즐 안으로 끌려가며 회전
     if(D.type==='vacuum'){
       const k=clamp(t/1.22,0,1);
       const e=k*k*(3-2*k);
@@ -3811,7 +3811,7 @@ clearTraps(){
       side=Math.sin(t*23)*0.012*(1-fall);
 
     }else{
-      // 스프레이·독 먹이
+      // 喷雾剂·독 먹이
       fall=clamp(t/1.5,0,1);
 
       roll=
@@ -3849,11 +3849,11 @@ clearTraps(){
 
 
 
-  // 죽은 뒤에는 알집 곁에서 사람이 다가오는 것을 지켜본다
+  // 죽은 뒤에는 卵鞘 곁에서 사람이 다가오는 것을 지켜본다
   watchCamera(dt){ const E=this.egg, cam=this.G.camera, A=this.ai;
     if(!E){ this.applyCam(this.p.x,this.p.z,this.camYaw,this.camPitch,0,null); return; }
     const yaw=Math.atan2(A.x-E.x,A.z-E.z); this.watchYaw=angleDamp(this.watchYaw===undefined?yaw:this.watchYaw,yaw,2.2,dt);
-    // 알집 뒤 0.5m에 두되, 가구·문 속이면 거리를 줄이고, 그래도 없으면 옆으로 돌려 빈자리를 찾는다. 자리가 바뀔 때 튀지 않게 부드럽게 옮긴다.
+    // 卵鞘 뒤 0.5m에 두되, 가구·문 속이면 거리를 줄이고, 그래도 없으면 옆으로 돌려 빈자리를 찾는다. 자리가 바뀔 때 튀지 않게 부드럽게 옮긴다.
     let bx=clamp(E.x-Math.sin(this.watchYaw)*0.5,-1.9,1.9), bz=clamp(E.z-Math.cos(this.watchYaw)*0.5,-2.9,2.9), found=false;
     for(const off of [0,0.5,-0.5,1,-1,1.6,-1.6,Math.PI]){ const a=this.watchYaw+off; for(let back=0.5;back>=0.14;back-=0.06){ const tx=clamp(E.x-Math.sin(a)*back,-1.9,1.9), tz=clamp(E.z-Math.cos(a)*back,-2.9,2.9); let ok=true; for(const o of OBST){ if(!o.roach&&inObst(o,tx,tz,0.03)){ ok=false; break; } } if(ok){ bx=tx; bz=tz; found=true; break; } } if(found) break; }
     if(!this.watchCam||this.watchCamT!==this.egg){ this.watchCam=new THREE.Vector3(bx,0.25,bz); this.watchCamT=this.egg; } else this.watchCam.lerp(this.tmp3.set(bx,0.25,bz),1-Math.exp(-5*dt));
@@ -3895,8 +3895,8 @@ class UI{
 
     e.textContent=
       mode==='laid'
-        ? '알집'
-        : '알 낳기';
+        ? '卵鞘'
+        : '产卵';
     if(mode==='show'&&was!=='show'){ e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop'); }
     if(mode!=='laid'){ e.classList.remove('ready','danger'); }
     if(mode==='none'){ e.style.setProperty('--p','0'); this.eggBar(null); } }
@@ -4061,7 +4061,7 @@ G.lineEnded=function(gen){
   G.blackout(true);
 
   const e=document.getElementById('endtext');
-  e.textContent='알집이 남지 않았다.';
+  e.textContent='卵鞘已不复存在。';
   e.style.display='grid';
 
   setTimeout(()=>{
@@ -4110,13 +4110,13 @@ G.showRank=function(gen,ended){
   const rk=document.getElementById('rank');
 
   rk.querySelector('.now').innerHTML=
-    `${generations}<small>세대</small>`;
+    `${generations}<small>代</small>`;
 
   rk.querySelector('.sub').textContent=
-    (ended?'사람은 방을 떠났다.':`${generations}세대가 이어졌다.`)+
-    (me>=0?` 이번이 ${me+1}위.`:'');
+    (ended?'人已经离开房间。':`延续了 ${generations} 代。`)+
+    (me>=0?` 这次是第 ${me+1} 名。`:'');
 
-  const row=(o,i)=>`<div class="${o.t===now?'me':''}">${i+1}위 · ${o.g+1}세대${o.e?' · 엔딩':''}</div>`;
+  const row=(o,i)=>`<div class="${o.t===now?'me':''}">第 ${i+1} 名 · 第 ${o.g+1} 代${o.e?' · 结局':''}</div>`;
   let html=list.slice(0,5).map(row).join('');
   if(me>=5) html+=`<div class="gap">⋯</div>`+row(list[me],me);
   rk.querySelector('.list').innerHTML=html;
