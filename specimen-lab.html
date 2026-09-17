@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>바퀴벌레</title>
+<title>蟑螂</title>
 <style>
 :root{
   --ivory:#f8f0dc;--ivory2:#eadcbc;--ink:#302017;--ink2:#6f4e38;--line:#b99464;
@@ -44,16 +44,16 @@ button{font:inherit;border:0;color:inherit;-webkit-tap-highlight-color:transpare
 <canvas id="gl"></canvas>
 <div id="ui">
   <div id="toolbar">
-    <button class="tool sel" data-tool="tweezer">족집게<span class="key">1</span></button>
-    <button class="tool" data-tool="pin">핀<span class="key">2</span></button>
-    <button class="tool" data-tool="camera">시점<span class="key">0</span></button>
+    <button class="tool sel" data-tool="tweezer">镊子<span class="key">1</span></button>
+    <button class="tool" data-tool="pin">固定针<span class="key">2</span></button>
+    <button class="tool" data-tool="camera">视角<span class="key">0</span></button>
   </div>
   <div id="side">
-    <button class="action" id="unpinBtn">핀 전부 빼기</button>
-    <button class="action" id="centerBtn">시점 원위치</button>
-    <button class="action" id="flipBtn">뒤집기</button>
-    <button class="action" id="wipeBtn">싹 치우기</button>
-    <button class="action dark" id="resetBtn">새 바퀴벌레</button>
+    <button class="action" id="unpinBtn">拔出所有固定针</button>
+    <button class="action" id="centerBtn">视角归位</button>
+    <button class="action" id="flipBtn">翻面</button>
+    <button class="action" id="wipeBtn">全部清理</button>
+    <button class="action dark" id="resetBtn">新的蟑螂</button>
   </div>
   <div id="hint"></div>
   <div id="partLabel"></div>
@@ -98,13 +98,13 @@ const DEFAULT_OPTIONS={
 let appOptions={...DEFAULT_OPTIONS};
 let started=true,appPaused=false,pageHidden=document.hidden,disposed=false;
 
-const SIDE_NAME={L:'왼쪽',R:'오른쪽'};
-const LEG_NAME={front:'앞다리',middle:'가운데다리',rear:'뒷다리'};
-const SEG_NAME={coxa:'밑마디',trochanter:'도래마디',femur:'넓적마디',tibia:'종아리마디',tarsus1:'발목 1마디',tarsus2:'발목 2마디',tarsus3:'발목 3마디',claw:'발톱'};
+const SIDE_NAME={L:'左侧',R:'右侧'};
+const LEG_NAME={front:'前足',middle:'中足',rear:'后足'};
+const SEG_NAME={coxa:'基节',trochanter:'转节',femur:'股节',tibia:'胫节',tarsus1:'跗节 1',tarsus2:'跗节 2',tarsus3:'跗节 3',claw:'爪'};
 const TOOL_HINT={
-  tweezer:'터치 후 드래그로 집어 당긴다. 작은 부위가 먼저 잡히며, 핀 머리를 누르면 핀도 뽑힌다.',
-  pin:'고정할 부위를 누른다. 핀 머리를 다시 누르면 뺄 수 있다.',
-  camera:'한 손가락 또는 마우스 왼쪽 드래그로 회전하고, 휠이나 두 손가락으로 확대한다.'
+  tweezer:'触摸并拖动来夹取。较小的部位会优先被夹住，点击固定针的针帽即可拔出。',
+  pin:'点击需要固定的部位。再次点击针帽即可拔出固定针。',
+  camera:'单指或鼠标左键拖动旋转，滚轮或双指缩放。'
 };
 
 const geometryCache=new Map();
@@ -158,7 +158,7 @@ class AudioFX{
     if(!this.ctx)return;const c=this.ctx,t=c.currentTime+delay,o=c.createOscillator();o.type=type;o.frequency.setValueAtTime(freq,t);if(end)o.frequency.exponentialRampToValueAtTime(Math.max(20,end),t+dur);const g=c.createGain();this.env(g,t,attack,dur,gain);const p=c.createStereoPanner();p.pan.value=clamp(pan,-1,1);o.connect(g);g.connect(p);p.connect(this.master);o.start(t);o.stop(t+attack+dur+.04)
   }
   // ── 재료 소리 ──
-  // 껍질이 잘게 부서지는 소리: 아주 짧은 딸깍을 불규칙하게 흩뿌린다 (바삭·뿌드득)
+  // 껍질이 잘게 부서지는 소리: 아주 짧은 딸깍을 火규칙하게 흩뿌린다 (바삭·뿌드득)
   crackle({delay=0,dur=.12,n=10,gain=.2,fmin=1800,fmax=6500,pan=0,q=2.2}={}){
     for(let i=0;i<n;i++){const k=Math.pow(Math.random(),.7);this.noise({delay:delay+k*dur,dur:rand(.003,.011),gain:gain*rand(.45,1.15)*(1-k*.45),freq:rand(fmin,fmax),q,pan:pan+rand(-.12,.12)})}
   }
@@ -217,18 +217,18 @@ class AudioFX{
     }else if(r==='jaw'){
       this.snap({size:.55,gain:.45,pan});this.crackle({dur:.05,n:5,gain:.14,pan});this.squish({delay:.03,size:.35,gain:.22,pan});
     }else{
-      // 뚝·딱 — 다리 마디, 더듬이, 수염, 발톱
+      // 뚝·딱 — 다리 마디, 더듬이, 수염, 爪
       this.snap({size,gain:.3+size*.3+f*.12,pan});this.crackle({delay:.004,dur:.04+size*.05,n:3+Math.round(size*6),gain:.12+size*.08,pan});
       this.squish({delay:.02,size:size*.6,gain:.1+size*.22,pan});
     }
   }
-  // 뿍 — 핀이 껍질을 뚫고 판에 박힌다
+  // 뿍 — 固定针이 껍질을 뚫고 판에 박힌다
   pin(){
     if(!this.ready())return;this.snap({size:.45,gain:.42});this.crackle({dur:.035,n:4,gain:.13});
     this.squish({delay:.018,size:.35,gain:.24});this.tone({delay:.05,dur:.05,gain:.22,freq:190,end:85,type:'triangle'});
     this.tone({delay:.052,dur:.22,gain:.03,freq:3300,type:'sine'});
   }
-  // 쪽 — 핀을 뽑을 때 진물이 달라붙는다
+  // 쪽 — 固定针을 뽑을 때 진물이 달라붙는다
   unpin(){
     if(!this.ready())return;this.noise({dur:.045,gain:.16,freq:5200,q:1.4,type:'highpass'});
     this.noise({delay:.01,dur:.09,gain:.26,freq:300,end:1300,q:1.2,type:'lowpass',attack:.01});this.tone({delay:.02,dur:.03,gain:.1,freq:700,end:1100});
@@ -420,7 +420,7 @@ function chainRots(dirs){
   return out;
 }
 function colorArray(list){return new THREE.Float32BufferAttribute(list,3)}
-// 앞가슴 등판: 위에서 보면 머리 쪽은 반원, 배 쪽은 완만한 D자. 가운데만 볼록하고 가장자리는 얇게 들린 방패.
+// 前胸背板: 위에서 보면 头部 쪽은 반원, 배 쪽은 완만한 D자. 가운데만 볼록하고 가장자리는 얇게 들린 방패.
 function pronotumGeometry(){
   const N=IS_SMALL?44:60,K=IS_SMALL?10:13,W=.78,LF=.66,LR=.43,P=3.3;
   const pos=[],col=[],idx=[],c=new THREE.Color();
@@ -475,7 +475,7 @@ function abdomenGeometry(W,HD,HV,L){
   for(let j=0;j<M;j++){idx.push(fc,j,(j+1)%M);idx.push(rc,R*M+(j+1)%M,R*M+j)}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('color',colorArray(col));g.setIndex(idx);g.computeVertexNormals();return g;
 }
-// 머리: 정수리가 넓고 입 쪽으로 좁아지는 역삼각형에 가까운 모양
+// 头部: 정수리가 넓고 입 쪽으로 좁아지는 역삼각형에 가까운 모양
 function headGeometry(){
   const g=new THREE.SphereGeometry(1,IS_SMALL?36:48,IS_SMALL?28:36),p=g.attributes.position,col=[],c=new THREE.Color();
   const base=new THREE.Color(0x6a3015),top=new THREE.Color(0x47190a),low=new THREE.Color(0x7d3b19);
@@ -485,7 +485,7 @@ function headGeometry(){
   }
   g.setAttribute('color',colorArray(col));g.computeVertexNormals();return g;
 }
-// 겹눈: 머리 옆면에 붙은 콩팥 모양. notch 쪽(앞·안쪽)이 더듬이 뿌리를 감싸며 오목하다.
+// 겹눈: 头部 옆면에 붙은 콩팥 모양. notch 쪽(앞·안쪽)이 더듬이 뿌리를 감싸며 오목하다.
 function eyeGeometry(notch){
   const g=new THREE.SphereGeometry(1,IS_SMALL?18:24,IS_SMALL?14:18),p=g.attributes.position;
   for(let i=0;i<p.count;i++){
@@ -554,7 +554,7 @@ class Specimen{
     this.shockImpulse=0;this.heatImpulse=0;this.recentPain=0;this.painImpulse=0;this.agony=0;this.agonyTarget=0;this.trauma=0;this.reaction=0;this.reactionTarget=0;this.crawlPhase=0;this.twistPhase=rand(TAU);this.intent=rand(TAU);this.intentT=0;
     this.totalCuts=0;this.totalDamage=0;this.fluidVolume=0;this.baseRootY=.43;this.floorOffset=0;this.floorTarget=0;this.floorT=0;this.systemT=0;this.materialT=0;
     this.root=new THREE.Group();specimenGroup.add(this.root);this.root.position.set(0,this.baseRootY,.32);
-    // 뒤집기 전용 축: 몸 전체를 긴 축 기준으로 굴린다 (root는 이동·방향·몸부림을 맡는다)
+    // 翻面 전용 축: 몸 전체를 긴 축 기준으로 굴린다 (root는 이동·방향·몸부림을 맡는다)
     this.flipNode=new THREE.Group();this.root.add(this.flipNode);this.flip={on:false,t:1,from:0,to:0};this.build();
   }
   addPart(id,node,meshes,opts={}){
@@ -629,24 +629,24 @@ class Specimen{
     return parts;
   }
   build(){
-    // ── 몸통 뼈대: 가운데가슴(날개 밑), 뒷가슴, 앞가슴 등판(방패), 머리(등판 밑으로 숙임) ──
-    const mid=this.ellipsoid('thorax_mid',this.flipNode,v3(0,0,0),v3(.58,.16,.36),mat.body,{label:'중가슴',role:'core',fatal:.36,jointStrength:1});
-    const rear=this.ellipsoid('thorax_rear',mid.node,v3(0,-.01,-.42),v3(.62,.16,.34),mat.body,{label:'뒷가슴',role:'core',parentId:'thorax_mid',fatal:.24,jointStrength:.88,jointLocal:v3(0,.02,-.2)});
-    const pro=this.customPart('pronotum',mid.node,v3(0,.2,.44),sharedGeometry('pronotum',pronotumGeometry),mat.pronotum,{label:'앞가슴 등판',role:'core',parentId:'thorax_mid',fatal:.38,jointStrength:.93,jointLocal:v3(0,.12,.12)});
-    const head=this.customPart('head_core',pro.node,v3(0,-.23,.6),sharedGeometry('head',headGeometry),mat.head,{label:'머리',role:'core',parentId:'pronotum',fatal:.46,jointStrength:.86,jointLocal:v3(0,-.17,.36),meshRot:{x:.42}});
-    // 겉에서 보이는 목 막 (머리를 떼면 드러나는 연한 막)
+    // ── 몸통 뼈대: 가운데가슴(날개 밑), 后胸, 前胸背板(방패), 头部(등판 밑으로 숙임) ──
+    const mid=this.ellipsoid('thorax_mid',this.flipNode,v3(0,0,0),v3(.58,.16,.36),mat.body,{label:'中胸',role:'core',fatal:.36,jointStrength:1});
+    const rear=this.ellipsoid('thorax_rear',mid.node,v3(0,-.01,-.42),v3(.62,.16,.34),mat.body,{label:'后胸',role:'core',parentId:'thorax_mid',fatal:.24,jointStrength:.88,jointLocal:v3(0,.02,-.2)});
+    const pro=this.customPart('pronotum',mid.node,v3(0,.2,.44),sharedGeometry('pronotum',pronotumGeometry),mat.pronotum,{label:'前胸背板',role:'core',parentId:'thorax_mid',fatal:.38,jointStrength:.93,jointLocal:v3(0,.12,.12)});
+    const head=this.customPart('head_core',pro.node,v3(0,-.23,.6),sharedGeometry('head',headGeometry),mat.head,{label:'头部',role:'core',parentId:'pronotum',fatal:.46,jointStrength:.86,jointLocal:v3(0,-.17,.36),meshRot:{x:.42}});
+    // 겉에서 보이는 목 막 (头部를 떼면 드러나는 연한 막)
     for(const side of ['L','R']){
       const s=side==='R'?1:-1;
       // 겹눈: 더듬이 뿌리를 감싸는 콩팥 모양. 뽑으면 그 자리에 연한 속살이 드러난다.
       const eyeGeo=sharedGeometry(`eye:${s}`,()=>eyeGeometry(s));
       const eyeRot={x:-.3,y:s>0?-.4:Math.PI+.4,z:0},eyePos=v3(s*.232,.05,.06);
-      const eye=this.customPart(`eye_${side}`,head.node,eyePos,eyeGeo,mat.eye,{rot:eyeRot,label:`${SIDE_NAME[side]} 겹눈`,role:'eye',parentId:'head_core',small:true,jointStrength:.34});
+      const eye=this.customPart(`eye_${side}`,head.node,eyePos,eyeGeo,mat.eye,{rot:eyeRot,label:`${SIDE_NAME[side]} 复眼`,role:'eye',parentId:'head_core',small:true,jointStrength:.34});
       // 큰턱: 입이 아래를 향한다
       const mandSock=this.socket(head.node,v3(s*.07,-.2,.1),v3(.06,.04,.06));
-      this.chain(`mandible_${side}`,head.node,'head_core',v3(s*.085,-.19,.1),[v3(-s*.35,-.78,.45)],[.15],[[.065,.022]],mat.dark,()=>({id:`mandible_${side}`,label:`${SIDE_NAME[side]} 큰턱`,role:'jaw',small:true,jointStrength:.48,socket:mandSock,midCut:true}))[0].socket=mandSock;
+      this.chain(`mandible_${side}`,head.node,'head_core',v3(s*.085,-.19,.1),[v3(-s*.35,-.78,.45)],[.15],[[.065,.022]],mat.dark,()=>({id:`mandible_${side}`,label:`${SIDE_NAME[side]} 大颚`,role:'jaw',small:true,jointStrength:.48,socket:mandSock,midCut:true}))[0].socket=mandSock;
       // 작은입수염
-      this.chain(`palp_${side}`,head.node,'head_core',v3(s*.15,-.16,.12),[v3(s*.45,-.28,.84),v3(s*.36,-.5,.78),v3(s*.24,-.72,.62)],[.15,.13,.11],[[.024,.02],[.02,.016],[.016,.011]],mat.leg,i=>({label:`${SIDE_NAME[side]} 작은입수염 ${i+1}마디`,role:'palp',small:true,jointStrength:.25,midCut:true}));
-      // 더듬이: 몸길이보다 길게. 굵은 밑마디 두 개 + 가늘어지는 채찍마디
+      this.chain(`palp_${side}`,head.node,'head_core',v3(s*.15,-.16,.12),[v3(s*.45,-.28,.84),v3(s*.36,-.5,.78),v3(s*.24,-.72,.62)],[.15,.13,.11],[[.024,.02],[.02,.016],[.016,.011]],mat.leg,i=>({label:`${SIDE_NAME[side]} 小颚须 ${i+1} 节`,role:'palp',small:true,jointStrength:.25,midCut:true}));
+      // 더듬이: 몸길이보다 길게. 굵은 基节 두 개 + 가늘어지는 채찍마디
       const AN=IS_SMALL?22:28,antDirs=[],antLens=[],antRadii=[];
       for(let i=0;i<AN;i++){
         const u=i/(AN-1),yaw=.3+2.4*Math.pow(u,1.2),pitch=.5-1.13*Math.pow(u,.85);
@@ -654,7 +654,7 @@ class Specimen{
         antLens.push(i===0?.12:i===1?.07:lerp(.2,.13,(i-2)/(AN-3))*(28/AN));
         const ra=i===0?.034:i===1?.026:lerp(.02,.0042,Math.pow((i-2)/(AN-3),.8));antRadii.push([ra,i===0?.028:i===1?.022:ra*.93]);
       }
-      const ant=this.chain(`antenna_${side}`,head.node,'head_core',v3(s*.12,.1,.17),antDirs,antLens,antRadii,mat.antenna,i=>({label:`${SIDE_NAME[side]} 더듬이 ${i+1}마디`,role:'antenna',small:true,jointStrength:.18+.3*(1-i/AN)*.2,midCut:true}));
+      const ant=this.chain(`antenna_${side}`,head.node,'head_core',v3(s*.12,.1,.17),antDirs,antLens,antRadii,mat.antenna,i=>({label:`${SIDE_NAME[side]} 触角 ${i+1} 节`,role:'antenna',small:true,jointStrength:.18+.3*(1-i/AN)*.2,midCut:true}));
       ant.forEach((ap,i)=>{ap.animOffset=i*.45*(8/AN)+(side==='R'?0:1.7);ap.antN=AN});
     }
     // ── 배: 8마디 판이 앞에서 뒤로 기와처럼 겹친다 ──
@@ -666,22 +666,22 @@ class Specimen{
     for(let i=1;i<=8;i++){
       const a=ABD[i-1];const dz=i===1?-.4:-((prev.l+a.l)*.5*.8);const dy=i===1?-.01:-.012;
       const geo=sharedGeometry(`abd:${i}`,()=>abdomenGeometry(a.w,a.hd,a.hv,a.l));
-      const p=this.customPart(`abdomen_${i}`,parent,v3(0,dy,dz),geo,mat.abdomen,{label:`배 ${i}마디`,role:'abdomen',parentId,fatal:i<4?.13:.07,jointStrength:lerp(.72,.42,(i-1)/7),jointLocal:v3(0,dy,dz+a.l*.42)});
+      const p=this.customPart(`abdomen_${i}`,parent,v3(0,dy,dz),geo,mat.abdomen,{label:`腹部第 ${i} 节`,role:'abdomen',parentId,fatal:i<4?.13:.07,jointStrength:lerp(.72,.42,(i-1)/7),jointLocal:v3(0,dy,dz+a.l*.42)});
       p.abdDims=a;parent=p.node;parentId=p.id;prev=a;
     }
     // 꼬리 감각돌기
     const tail=this.parts.get('abdomen_8');
     for(const side of ['L','R']){const s=side==='R'?1:-1;
-      this.chain(`cercus_${side}`,tail.node,'abdomen_8',v3(s*.1,.02,-.07),[v3(s*.34,.07,-.94),v3(s*.4,.05,-.92),v3(s*.46,.02,-.89),v3(s*.5,0,-.87)],[.1,.095,.085,.075],[[.03,.026],[.026,.021],[.021,.016],[.016,.008]],mat.leg,i=>({label:`${SIDE_NAME[side]} 꼬리감각돌기 ${i+1}마디`,role:'cercus',small:true,midCut:true,jointStrength:.2}));
+      this.chain(`cercus_${side}`,tail.node,'abdomen_8',v3(s*.1,.02,-.07),[v3(s*.34,.07,-.94),v3(s*.4,.05,-.92),v3(s*.46,.02,-.89),v3(s*.5,0,-.87)],[.1,.095,.085,.075],[[.03,.026],[.026,.021],[.021,.016],[.016,.008]],mat.leg,i=>({label:`${SIDE_NAME[side]} 尾须 ${i+1} 节`,role:'cercus',small:true,midCut:true,jointStrength:.2}));
     }
-    // ── 날개: 겉날개 두 장이 가운데서 겹친다 (오른쪽이 위). 몸을 따라 바깥쪽이 아래로 휜다 ──
+    // ── 날개: 겉날개 두 장이 가운데서 겹친다 (右侧이 위). 몸을 따라 바깥쪽이 아래로 휜다 ──
     for(const side of ['L','R']){
       const s=side==='R'?1:-1,top=s>0;
-      const tg=this.wingPart(`forewing_${side}`,rear.node,v3(s*.03,top?.24:.222,.47),sharedGeometry(`tegmen:${s}`,()=>wingGeometry(s,{cx:.27,a:.5,len:3.0,p:2.35,drape:.45,tipDrop:.12,veins:true})),mat.tegmen,{label:`${SIDE_NAME[side]} 겉날개`,role:'wing',parentId:'thorax_rear',jointStrength:.5});tg.wingKind='tegmen';
+      const tg=this.wingPart(`forewing_${side}`,rear.node,v3(s*.03,top?.24:.222,.47),sharedGeometry(`tegmen:${s}`,()=>wingGeometry(s,{cx:.27,a:.5,len:3.0,p:2.35,drape:.45,tipDrop:.12,veins:true})),mat.tegmen,{label:`${SIDE_NAME[side]} 前翅`,role:'wing',parentId:'thorax_rear',jointStrength:.5});tg.wingKind='tegmen';
       tg.meshes[0].renderOrder=top?2:1;
-      const hw=this.wingPart(`hindwing_${side}`,rear.node,v3(s*.03,.2,.42),sharedGeometry(`hind:${s}`,()=>wingGeometry(s,{cx:.25,a:.4,len:2.55,p:2.1,drape:.5,tipDrop:.12,veins:true,fan:true})),mat.hind,{label:`${SIDE_NAME[side]} 속날개`,role:'wing',parentId:'thorax_rear',jointStrength:.22});hw.wingKind='hind';
+      const hw=this.wingPart(`hindwing_${side}`,rear.node,v3(s*.03,.2,.42),sharedGeometry(`hind:${s}`,()=>wingGeometry(s,{cx:.25,a:.4,len:2.55,p:2.1,drape:.5,tipDrop:.12,veins:true,fan:true})),mat.hind,{label:`${SIDE_NAME[side]} 后翅`,role:'wing',parentId:'thorax_rear',jointStrength:.22});hw.wingKind='hind';
     }
-    // ── 다리 6개: 앞다리는 앞으로, 가운데는 옆으로, 뒷다리는 뒤로 뻗고 발끝이 바닥을 짚는다 ──
+    // ── 다리 6개: 前足는 앞으로, 가운데는 옆으로, 后足는 뒤로 뻗고 발끝이 바닥을 짚는다 ──
     const legDefs=[
       {pair:'front',parent:pro.node,parentId:'pronotum',start:v3(.2,-.28,.05),
         dirs:[[.45,-.22,.8],[.68,-.1,.72],[.82,.04,.58],[.62,-.37,.72],[.46,-.12,.87],[.38,-.04,.92],[.3,-.02,.95]],lens:[.22,.13,.55,.6,.2,.14,.12]},
@@ -707,7 +707,7 @@ class Specimen{
       this.decorateSpines(t3,{count:Math.round(4*dense),lenMin:.02,lenMax:.035,tilt:.6,thick:.07});
       const clawNode=new THREE.Group();clawNode.position.set(0,0,0);t3.childAnchor.add(clawNode);const clawMeshes=[];
       const clawGeo=sharedGeometry('claw-torus',()=>new THREE.TorusGeometry(.045,.009,5,IS_SMALL?10:13,Math.PI*.72));for(const k of [-1,1]){const m=new THREE.Mesh(clawGeo,mat.dark);m.position.set(.012,0,k*.016);m.rotation.set(Math.PI/2,k*.5,-.9);clawNode.add(m);clawMeshes.push(m)}
-      const claw=this.addPart(`leg_${side}_${def.pair}_claw`,clawNode,clawMeshes,{label:`${SIDE_NAME[side]} ${LEG_NAME[def.pair]} 발톱`,role:'claw',parentId:t3.id,small:true,jointStrength:.15});for(const m of clawMeshes)addPickProxy(claw,m,{all:1.45});parts.push(claw);
+      const claw=this.addPart(`leg_${side}_${def.pair}_claw`,clawNode,clawMeshes,{label:`${SIDE_NAME[side]} ${LEG_NAME[def.pair]} 爪`,role:'claw',parentId:t3.id,small:true,jointStrength:.15});for(const m of clawMeshes)addPickProxy(claw,m,{all:1.45});parts.push(claw);
       this.legAnim.push({side:s,pair:def.pair,parts,phase:rand(TAU),baseYaw:parts[0].node.rotation.y,baseRot:parts.map(p=>p.node.rotation.clone())});
     }
     this.refreshGraph();
@@ -769,7 +769,7 @@ Specimen.prototype.attachScar=function(targetNode,worldPoint,worldNormal,size=.0
   const flapN=opts.ragged===false?(IS_SMALL?2:3):(IS_SMALL?3:6);for(let i=0;i<flapN;i++){const a=rand(TAU),w=size*rand(.12,.25),h=size*rand(.22,.48);const sh=new THREE.Shape();sh.moveTo(-w*.5,0);sh.lineTo(w*.5,0);sh.lineTo(rand(-w*.15,w*.15),h);sh.closePath();const flap=new THREE.Mesh(new THREE.ShapeGeometry(sh),cloneWorkingMaterial(mat.tear));flap.position.set(Math.cos(a)*size*.62,Math.sin(a)*size*.62,.008);flap.rotation.z=a-Math.PI/2;flap.rotation.x=rand(-.45,.45);group.add(flap)}
   return group
 };
-// 눈을 뽑으면 머리 표면을 실제로 콩팥 모양으로 움푹 파낸다. 가장자리는 찢긴 껍질처럼 살짝 들리고 어둡게, 바닥은 젖은 속살 색.
+// 눈을 뽑으면 头部 표면을 실제로 콩팥 모양으로 움푹 파낸다. 가장자리는 찢긴 껍질처럼 살짝 들리고 어둡게, 바닥은 젖은 속살 색.
 Specimen.prototype.carveEyeSocket=function(eye){
   const head=this.parts.get('head_core'),mesh=head?.meshes?.[0];if(!mesh)return null;
   if(mesh.geometry.userData.shared){const g=mesh.geometry.clone();g.userData={};mesh.geometry=g}
@@ -852,7 +852,7 @@ Specimen.prototype.updateStrands=function(dt){
     s.a.updateWorldMatrix(true,false);s.b.updateWorldMatrix(true,false);
     const pa=s.a.localToWorld(s.la.clone()),pb=s.b.localToWorld(s.lb.clone()),d=pa.distanceTo(pb),k=clamp(d/s.snap);
     if(d>s.snap){
-      // 툭 끊어지며 양쪽에 짧은 끄트머리가 늘어진다
+      // 툭 끊어지며 양쪽에 짧은 끄트头部가 늘어진다
       disposeObject3D(s.mesh);this.strands.splice(i,1);
       for(const [node,p,q] of [[s.a,pa,pb],[s.b,pb,pa]]){const dirv=q.clone().sub(p).normalize(),e1=p.clone().addScaledVector(dirv,.08).add(v3(0,-.05,0)),e2=p.clone().addScaledVector(dirv,.13).add(v3(0,-.12,0));e2.y=Math.max(e2.y,boardTopY+.01);
         const stub=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([p,e1,e2]),8,s.r*.8,6,false),mat.gut);scene.add(stub);node.attach(stub)}
@@ -936,7 +936,7 @@ Specimen.prototype.updateAgony=function(dt){
   const avg=count?dmg/count:0,loss=clamp(detached/18),pinStress=clamp(this.pins.length*.055,0,.28),coreStress=clamp(1-this.central),respStress=clamp(1-this.respiration);
   const chronic=clamp(this.totalDamage/4.2);this.agonyTarget=clamp(avg*.62+loss*.55+chronic*.68+pinStress+coreStress*.25+respStress*.15+this.recentPain*.38+this.shockImpulse*.22+this.heatImpulse*.13,0,1.65);
   this.agony=damp(this.agony,this.agonyTarget,this.agonyTarget>this.agony?5.8:1.4,dt);this.recentPain=Math.max(0,this.recentPain-dt*.19);this.painImpulse=Math.max(0,this.painImpulse-dt*2.4);
-  // 처음에는 완전히 가만히 있고, 핀 여러 개·지속적인 당김·부위 분리처럼 외상이 누적된 뒤에만 전신 경련이 켜진다.
+  // 처음에는 완전히 가만히 있고, 固定针 여러 개·지속적인 당김·부위 분리처럼 외상이 누적된 뒤에만 전신 경련이 켜진다.
   const ordeal=this.trauma+this.totalDamage*1.25+loss*.72+coreStress*.42+Math.max(0,this.pins.length-1)*.045;
   this.reactionTarget=this.life==='still'?.035:smoothstep(.42,1.2,ordeal);this.reaction=damp(this.reaction,this.reactionTarget,this.reactionTarget>this.reaction?3.4:.5,dt);
 };
@@ -1009,7 +1009,7 @@ function resolveLooseFloor(rec){
 }
 Specimen.prototype.toggleFlip=function(){
   const F=this.flip;if(F.t<1)return false;
-  if(this.pins.length){toast('고정 핀부터 뺀다');return false}
+  if(this.pins.length){toast('请先拔出固定针');return false}
   cancelAction();F.on=!F.on;F.from=this.flipNode.rotation.z;F.to=F.on?(Math.random()<.5?Math.PI:-Math.PI):0;F.t=0;SFX.flipWhoosh();this.stimulate(.18);return true;
 };
 // 휙 들어 올려 공중에서 굴린 뒤 떨어뜨린다 (펼친 다리·더듬이가 판을 뚫지 않을 만큼 높이 띄운다)
@@ -1055,7 +1055,7 @@ Specimen.prototype.update=function(dt){
     else if(p.role!=='wing'&&p.baseScale)p.node.scale.y=p.baseScale.y*(1-s.surfacePress*.045-s.pinDepress*.055);
   }
   const rear=this.parts.get('thorax_rear'),pro=this.parts.get('pronotum');if(rear&&!rear.state.detached){rear.node.rotation.y=rear.baseEuler.y+Math.sin(this.twistPhase*.86)*response*ag*.04*live;rear.node.rotation.z=rear.baseEuler.z+Math.cos(this.twistPhase*1.13)*response*(ag*.028+imp*.02)*live}if(pro&&!pro.state.detached)pro.node.rotation.z=pro.baseEuler.z-Math.sin(this.twistPhase*.94)*response*(ag*.018+imp*.016)*live;
-  // 중가슴도 몸부림에 따라 비틀리고 들썩인다. 핀이 하나라도 박히면 멈춘다(중가슴이 움직이면 핀 박힌 다리까지 딸려 가므로).
+  // 中胸도 몸부림에 따라 비틀리고 들썩인다. 固定针이 하나라도 박히면 멈춘다(中胸이 움직이면 固定针 박힌 다리까지 딸려 가므로).
   const midP=this.parts.get('thorax_mid');if(midP&&!midP.state.detached&&!(grab&&grab.part===midP)){const mk=pinned?0:response*live;midP.node.rotation.x=midP.baseEuler.x+Math.sin(this.twistPhase*.71+.4)*mk*(.014+ag*.035);midP.node.rotation.y=midP.baseEuler.y+Math.sin(this.twistPhase*.63)*mk*(.025+ag*.06+imp*.035);midP.node.rotation.z=midP.baseEuler.z+Math.cos(this.twistPhase*.9)*mk*(.018+ag*.045)}
   // 버둥댈수록 다리가 판을 긁고, 심하면 겉날개를 부르르 떤다
   if(this.life!=='still'&&response>.08){
@@ -1120,7 +1120,7 @@ function setTargetedPart(part){
   }
 }
 function updateTargetVisual(sel){if(tool==='camera'||!sel?.part){clearPartOutline();return}setTargetedPart(sel.part)}
-// 핀도 족집게로 뽑을 수 있으니 부위와 똑같은 윤곽선을 두른다
+// 固定针도 镊子로 뽑을 수 있으니 부위와 똑같은 윤곽선을 두른다
 function setTargetedPin(rec){
   if(outlinedPart===rec)return;clearPartOutline();outlinedPart=rec;
   for(const mesh of [rec.head,rec.shaft]){
@@ -1180,7 +1180,7 @@ function placePinImmediate(hit){
   const shaftGeo=sharedGeometry('pin-shaft',()=>new THREE.CylinderGeometry(.015,.012,1,9));const shaft=new THREE.Mesh(shaftGeo,mat.steel);shaft.scale.y=len;shaft.position.y=boardTopY+len/2;shaft.castShadow=false;group.add(shaft);
   const headGeo=sharedGeometry('pin-head',()=>new THREE.SphereGeometry(.07,IS_SMALL?10:14,IS_SMALL?7:10));const head=new THREE.Mesh(headGeo,mat.red);head.scale.y=.55;head.position.y=headY+.01;head.castShadow=false;group.add(head);
   const rec={group,head,shaft,part:p,localPoint,target:wp.clone(),point:wp.clone()};head.userData.pinRec=rec;shaft.userData.pinRec=rec;
-  // 가는 핀 몸통도 잘 집히게 보이지 않는 굵은 손잡이를 겹친다
+  // 가는 固定针 몸통도 잘 집히게 보이지 않는 굵은 손잡이를 겹친다
   const grip=new THREE.Mesh(sharedGeometry('pin-grip',()=>new THREE.CylinderGeometry(.06,.06,1,8)),pickMaterial);grip.scale.y=len;grip.position.y=boardTopY+len/2;grip.userData.pinRec=rec;group.add(grip);rec.grip=grip;
   pinHeads.push(head,shaft,grip);specimen.pins.push(rec);p.pins.push(rec);p.state.pinned=true;p.state.pinDepress=1;
   const leg=specimen.legAnim.find(L=>L.parts.includes(p));if(leg&&!leg.pinRot)leg.pinRot=leg.parts.map(q=>q.node.rotation.clone());
@@ -1192,12 +1192,12 @@ function removePin(rec,{silent=false,stimulate=true,ooze=true}={}){
   if(ooze&&rec.part&&objectInScene(rec.part.node)){specimen.addFluid(hole,.022,2,false);specimen.registerWound(rec.part.node,hole,.2,false,12);specimen.addTrauma(.035)}if(stimulate&&rec.part){specimen.stimulate(.12,rec.part);specimen.painImpulse=Math.max(specimen.painImpulse,.14)}if(!silent)SFX.unpin();updateStats(true);
 }
 function removePinsForSubtree(part,opts={}){if(!part)return;const parts=new Set(specimen.collectSubtree(part));for(const rec of [...specimen.pins])if(parts.has(rec.part))removePin(rec,opts)}
-function removeAllPins(){const had=specimen.pins.length;for(const p of [...specimen.pins])removePin(p,{silent:true});if(had){SFX.unpin();toast('고정 핀을 전부 뺐다')}}
+function removeAllPins(){const had=specimen.pins.length;for(const p of [...specimen.pins])removePin(p,{silent:true});if(had){SFX.unpin();toast('已拔出所有固定针')}}
 
 let grab=null;
 const GRAB_TMP={target:new THREE.Vector3(),local:new THREE.Vector3(),delta:new THREE.Vector3()};
 function beginGrab(sel){
-  if(!sel)return;const p=sel.part;if(specimen.subtreeHasPins(p)){toast('고정 핀부터 뺀다');return}
+  if(!sel)return;const p=sel.part;if(specimen.subtreeHasPins(p)){toast('请先拔出固定针');return}
   const rec=specimen.findLooseRecord(p);p.userDragging=true;SFX.grab(p);
   grab={part:p,rec,sel,startWorld:p.worldPos(v3()),startLocal:p.node.position.clone(),parent:p.node.parent,plane:new THREE.Plane(v3(0,1,0),-sel.hit.point.y),last:sel.hit.point.clone()};if(rec)rec.dragging=true;triggerToolAction();
 }
@@ -1206,7 +1206,7 @@ function dragGrab(x,y){
   if(grab.rec||p.parentId===null&&p.state.detached){
     const rec=grab.rec||specimen.findLooseRecord(p);if(rec){rec.node.position.x=clamp(tgt.x,-tray.x+.1,tray.x-.1);rec.node.position.z=clamp(tgt.z,-tray.z+.1,tray.z-.1);rec.node.position.y=Math.max(boardTopY+.03,tgt.y);rec.vel.set(0,0,0);rec.rot.multiplyScalar(.2);resolveLooseFloor(rec)}return;
   }
-  // 중가슴은 몸 전체의 뿌리라 뜯기지 않는다. 대신 집고 끌면 몸통째 끌려온다(핀이 박혀 있으면 애초에 집히지 않는다).
+  // 中胸은 몸 전체의 뿌리라 뜯기지 않는다. 대신 집고 끌면 몸통째 끌려온다(固定针이 박혀 있으면 애초에 집히지 않는다).
   if(p.id==='thorax_mid'){const R=specimen.root;if(!grab.rootStart)grab.rootStart=R.position.clone();R.position.x=clamp(grab.rootStart.x+(tgt.x-grab.startWorld.x)*.85,-1.3,1.3);R.position.z=clamp(grab.rootStart.z+(tgt.z-grab.startWorld.z)*.85,-.9,1.4);p.state.strain=.45;SFX.strain(p,.45);specimen.stimulate(Math.min(.06,.012+dragStep*.12),p);specimen.addTrauma(Math.min(.012,.002+dragStep*.03));return}
   const dist=tgt.distanceTo(grab.startWorld),weak=clamp(1-p.state.cutDepth*.48-p.state.crack*.23-p.state.puncture*.18,.18,1),threshold=(.14+p.jointStrength*.3)*weak;
   p.state.strain=clamp(dist/Math.max(.04,threshold),0,2);SFX.strain(p,p.state.strain);p.state.shockPulse=Math.max(p.state.shockPulse,p.state.strain*.05);p.state.surfacePress=Math.max(p.state.surfacePress,.25+p.state.strain*.18);specimen.addTrauma(Math.min(.012,dragStep*.055+p.state.strain*.0012));specimen.stimulate(Math.min(.012,.003+p.state.strain*.003),p);
@@ -1237,8 +1237,8 @@ function handleDown(e){
   if(disposed||appPaused)return;SFX.ensure();pointers.add(e.pointerId);pointer.x=e.clientX;pointer.y=e.clientY;
   if(pointers.size>1){pointer.multi=true;cancelAction();return}if(tool==='camera')return;
   e.preventDefault();canvas.setPointerCapture?.(e.pointerId);pointer.down=true;pointer.id=e.pointerId;pointer.startX=pointer.x;pointer.startY=pointer.y;pointer.moved=0;updateToolRig(pointer.x,pointer.y);
-  if(tool==='pin'){const pr=pickPin(pointer.x,pointer.y);if(pr)removePin(pr);else{const sel=pickPart(pointer.x,pointer.y);if(sel)startContactAction('pin',sel);else toast('고정할 부위를 정확히 누른다')}pointer.down=false;return}
-  if(tool==='tweezer'){const pr=pickPin(pointer.x,pointer.y);if(pr){removePin(pr);triggerToolAction();pointer.down=false;return}const sel=pickPart(pointer.x,pointer.y);if(sel)beginGrab(sel);else toast('집을 부위를 정확히 누른다')}
+  if(tool==='pin'){const pr=pickPin(pointer.x,pointer.y);if(pr)removePin(pr);else{const sel=pickPart(pointer.x,pointer.y);if(sel)startContactAction('pin',sel);else toast('请准确点击要固定的部位')}pointer.down=false;return}
+  if(tool==='tweezer'){const pr=pickPin(pointer.x,pointer.y);if(pr){removePin(pr);triggerToolAction();pointer.down=false;return}const sel=pickPart(pointer.x,pointer.y);if(sel)beginGrab(sel);else toast('请准确点击要夹取的部位')}
 }
 function handleMove(e){
   pointer.x=e.clientX;pointer.y=e.clientY;pointer.moved+=Math.hypot(e.movementX||0,e.movementY||0);if(tool!=='camera')updateToolRig(pointer.x,pointer.y);
@@ -1255,7 +1255,7 @@ const UI={hint:$('#hint'),toast:$('#toast'),partLabel:$('#partLabel'),intro:$('#
 let hintTimer=0,toastTimer=0,labelPart=null,statsT=0,lastStatsKey='',lastLabelText='';
 function showHint(text,dur=3.5){UI.hint.textContent=text||'';UI.hint.classList.toggle('show',!!text);clearTimeout(hintTimer);if(text)hintTimer=setTimeout(()=>UI.hint.classList.remove('show'),dur*1000)}
 function toast(text){UI.toast.textContent=text;UI.toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>UI.toast.classList.remove('show'),1050)}
-function partStateText(p){const a=[];if(p.state.pinned)a.push('고정됨');if(p.state.detached)a.push('분리됨');return a.length?` · ${a.join(' · ')}`:''}
+function partStateText(p){const a=[];if(p.state.pinned)a.push('已固定');if(p.state.detached)a.push('已分离');return a.length?` · ${a.join(' · ')}`:''}
 function showPartLabel(p){if(!p){hidePartLabel();return}labelPart=p;const text=p.label+partStateText(p);if(text!==lastLabelText){lastLabelText=text;UI.partLabel.textContent=text}UI.partLabel.classList.add('show')}
 function hidePartLabel(){labelPart=null;lastLabelText='';UI.partLabel.classList.remove('show')}
 function resultSnapshot(){
@@ -1265,12 +1265,12 @@ function resultSnapshot(){
 function updateStats(force=false){
   const key=`${specimen.life}|${Math.round(specimen.locomotion*100)}|${specimen.pins.length}|${specimen.fragments}|${Math.round(specimen.reaction*100)}|${fluidField.count()}`;if(!force&&key===lastStatsKey)return;lastStatsKey=key;
   if(labelPart&&objectInScene(labelPart.node))showPartLabel(labelPart);
-  if(typeof appOptions.onChange==='function'){try{appOptions.onChange(resultSnapshot())}catch(err){console.error('SpecimenLab onChange 오류',err)}}
+  if(typeof appOptions.onChange==='function'){try{appOptions.onChange(resultSnapshot())}catch(err){console.error('SpecimenLab onChange 错误',err)}}
 }
 function prepBases(target=specimen){for(const p of target.parts.values()){p.baseEuler=p.node.rotation.clone();p.meshBaseScales=p.meshes.map(m=>m.scale.clone());p.meshBasePos=p.meshes.map(m=>m.position.clone())}}
 function settleBaseHeight(target=specimen){target.resolveConnectedFloor(0,true);target.baseRootY=target.root.position.y;target.floorOffset=0;target.floorTarget=0}
 function firstEnabledTool(){return ['tweezer','pin','camera'].find(toolEnabled)||'camera'}
-// ───────── 잔해: 새 바퀴벌레로 갈아도 앞의 시체·조각·진물은 판에 남는다 ─────────
+// ───────── 잔해: 新的蟑螂로 갈아도 앞의 시체·조각·진물은 판에 남는다 ─────────
 // 시체 하나를 통째로 한 덩어리 도형으로 굳혀서(그리기 1번) 남긴다. 최대 개수를 넘으면 가장 오래된 것부터 치운다.
 const REMAIN_SLOTS=[[-2.95,-1.8],[2.95,-1.8],[-2.95,1.8],[2.95,1.8]],REMAINS_CAP=REMAIN_SLOTS.length;
 const remains=[];let remainSlot=0;
@@ -1326,12 +1326,12 @@ function updateRemains(dt){
 function resetSpecimen({silent=false,wipe=false}={}){
   const old=specimen;discardSpecimen(old,!wipe&&specimenUsed(old));
   if(wipe){
-    // 싹 치우기: 쌓인 시체·조각·진물 자국까지 전부 닦아 낸다
+    // 全部清理: 쌓인 시체·조각·진물 자국까지 전부 닦아 낸다
     for(const r of remains){disposeObject3D(r.body);disposeObject3D(r.debris)}remains.length=0;remainSlot=0;
     fluidField.reset();clearDynamicGroup(fxGroup);SFX.wipe();
   }
   partSerial=0;specimen=new Specimen();prepBases(specimen);specimen.computeSystems();settleBaseHeight(specimen);lastStatsKey='';updateStats(true);setTool(firstEnabledTool());cameraHome();syncFlipLabel();
-  if(!silent)toast(wipe?'판을 싹 닦고 새 바퀴벌레를 올렸다':'새 바퀴벌레로 교체했다');return specimen;
+  if(!silent)toast(wipe?'已清理工作板并放上新的蟑螂':'已更换为新的蟑螂');return specimen;
 }
 function cameraHome(){camera.position.set(0,6.9,7.1);controls.target.set(0,.35,-.1);controls.update()}
 function applyOptions(next={}){
@@ -1351,10 +1351,10 @@ function onReset(e){e.stopPropagation();e.preventDefault();SFX.ensure();resetSpe
 let wipeArmT=0;
 function onWipe(e){
   e.stopPropagation();e.preventDefault();SFX.ensure();const b=$('#wipeBtn');
-  if(performance.now()<wipeArmT){wipeArmT=0;b.textContent='싹 치우기';resetSpecimen({wipe:true});return}
-  wipeArmT=performance.now()+2200;b.textContent='한 번 더 누르면 치움';setTimeout(()=>{if(performance.now()>=wipeArmT)b.textContent='싹 치우기'},2300);
+  if(performance.now()<wipeArmT){wipeArmT=0;b.textContent='全部清理';resetSpecimen({wipe:true});return}
+  wipeArmT=performance.now()+2200;b.textContent='再次点击即可清理';setTimeout(()=>{if(performance.now()>=wipeArmT)b.textContent='全部清理'},2300);
 }
-function syncFlipLabel(){$('#flipBtn').textContent=specimen.flip.on?'바로 놓기':'뒤집기'}
+function syncFlipLabel(){$('#flipBtn').textContent=specimen.flip.on?'放回原位':'翻面'}
 function flipSpecimen(){SFX.ensure();if(specimen.toggleFlip())syncFlipLabel();return api}
 function onFlip(e){e.stopPropagation();e.preventDefault();flipSpecimen()}
 function onStart(e){e.stopPropagation();e.preventDefault();SFX.ensure();started=true;appPaused=false;UI.intro.classList.add('hide');showHint(TOOL_HINT[tool],5)}
@@ -1366,7 +1366,7 @@ $('#unpinBtn').addEventListener('pointerdown',onUnpin);$('#centerBtn').addEventL
 function hoverUpdate(){
   if(!started||appPaused||pointer.down||tool==='camera'||pointer.multi)return;
   const pr=pickPin(pointer.x,pointer.y);
-  if(pr){setTargetedPin(pr);labelPart=null;lastLabelText='';UI.partLabel.textContent='고정 핀 · 족집게로 누르면 뽑힌다';UI.partLabel.classList.add('show');return}
+  if(pr){setTargetedPin(pr);labelPart=null;lastLabelText='';UI.partLabel.textContent='固定针 · 用镊子点击即可拔出';UI.partLabel.classList.add('show');return}
   const sel=pickPart(pointer.x,pointer.y);if(sel){showPartLabel(sel.part);updateTargetVisual(sel)}else{hidePartLabel();updateTargetVisual(null)}
 }
 function resize(){
@@ -1385,7 +1385,7 @@ function frame(){
 }
 
 function mount(container,options={}){
-  const host=typeof container==='string'?document.querySelector(container):container;if(!host)throw new Error('SpecimenLab.mount: 대상 컨테이너를 찾지 못했습니다.');if(host!==document.body&&getComputedStyle(host).position==='static')host.style.position='relative';host.appendChild(rootEl);rootEl.classList.toggle('embedded',host!==document.body);applyOptions(options);resize();return api;
+  const host=typeof container==='string'?document.querySelector(container):container;if(!host)throw new Error('SpecimenLab.mount：找不到目标容器。');if(host!==document.body&&getComputedStyle(host).position==='static')host.style.position='relative';host.appendChild(rootEl);rootEl.classList.toggle('embedded',host!==document.body);applyOptions(options);resize();return api;
 }
 function enter(payload={}){
   const options=payload.options||payload;applyOptions(options);if(payload.reset||appOptions.resetOnEnter)resetSpecimen({silent:true});started=true;appPaused=false;UI.intro.classList.add('hide');wake();return api;
@@ -1394,7 +1394,7 @@ function pause(){appPaused=true;cancelAction();return api}
 function resume(){appPaused=false;started=true;last=now();return api}
 function sleep(){appPaused=true;cancelAction();if(rafId){cancelAnimationFrame(rafId);rafId=0}return api}
 function wake(){if(disposed)return api;appPaused=false;started=true;last=now();resize();if(!rafId)rafId=requestAnimationFrame(frame);return api}
-function exit(){const result=resultSnapshot();started=false;appPaused=true;cancelAction();if(typeof appOptions.onExit==='function'){try{appOptions.onExit(result)}catch(err){console.error('SpecimenLab onExit 오류',err)}}return result}
+function exit(){const result=resultSnapshot();started=false;appPaused=true;cancelAction();if(typeof appOptions.onExit==='function'){try{appOptions.onExit(result)}catch(err){console.error('SpecimenLab onExit 错误',err)}}return result}
 function disposeApp(){
   if(disposed)return;disposed=true;cancelAnimationFrame(rafId);clearTimeout(hintTimer);clearTimeout(toastTimer);resizeObserver?.disconnect();
   canvas.removeEventListener('pointerdown',handleDown);canvas.removeEventListener('pointermove',handleMove);window.removeEventListener('pointerup',handleUp);window.removeEventListener('pointercancel',handleUp);canvas.removeEventListener('contextmenu',preventContext);canvas.removeEventListener('pointerleave',handlePointerLeave);
